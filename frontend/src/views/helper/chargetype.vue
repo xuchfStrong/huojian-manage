@@ -33,7 +33,7 @@
 			<el-table-column prop="days" label="充值天数"/>
 			<el-table-column prop="content" label="备注"/>
 				
-      <el-table-column fixed="right" label="操作" align="center" width="150">
+      <el-table-column label="操作" align="center" width="150">
         <template slot-scope="scope" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.chargetype.auth_update">
           <el-button size="mini" @click="edit_data(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="delete_data_fuc(scope.row)">删除</el-button>

@@ -32,7 +32,7 @@
 				<el-table-column prop="group.group_type" label="角色"/>
 				<el-table-column prop="bf_logo_time" label="上次登录时间"/>
 				
-      <el-table-column fixed="right" label="操作" width="150" align="center">
+      <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
           <el-button size="small" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.user.auth_update" @click="edit_data(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.user.auth_destroy"  @click="delete_data_fuc(scope.row)">删除</el-button>

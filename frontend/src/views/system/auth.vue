@@ -31,7 +31,7 @@
           <span>{{ get_auth(scope.row.auth_permissions) }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="100" align="center">
+      <el-table-column label="操作" width="100" align="center">
         <template slot-scope="scope">
           <el-row v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.auth.auth_update">
             <el-button size="small" @click="edit_data(scope.row)">编辑</el-button>

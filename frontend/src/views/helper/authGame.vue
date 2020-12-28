@@ -21,7 +21,7 @@
 			<el-table-column prop="game_name_cn" label="游戏名称"/>
       <el-table-column prop="auth_type" label="权限"/>
 				
-      <el-table-column fixed="right" label="操作" align="center">
+      <el-table-column label="操作" align="center">
         <template slot-scope="scope" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.authGame.auth_update">
           <el-button size="mini" @click="edit_data(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="delete_data_fuc(scope.row)">删除</el-button>

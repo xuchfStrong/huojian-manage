@@ -20,7 +20,7 @@
       <el-table-column prop="phone" label="手机"/>
       <el-table-column prop="email" label="邮箱"/>
       <el-table-column prop="bf_logo_time" label="上次登录时间" width="155"/>
-      <el-table-column fixed="right" label="操作" width="100" align="center">
+      <el-table-column label="操作" width="100" align="center">
         <template slot-scope="scope">
           <el-button size="small" @click="edit_data(scope.row)">编辑</el-button>
         </template>
