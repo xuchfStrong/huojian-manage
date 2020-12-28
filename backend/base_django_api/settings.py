@@ -19,13 +19,13 @@ SECRET_KEY = '0b($)a_$n$!grvsj!pob$5z4(q+u3fo_)aoz!g)3^=pk@7g770sdfgertgsdfdjang
 # SECURITY WARNING: don't run with debug turned on in production!
 # 如果出现报错为：django.template.response.ContentNotRenderedError: The response content must be rendered before it can be accessed.
 # 那么很有可能是数据库的问题：在jwt的认证模块中，搜索用户的位置查找可能的问题
-DEBUG = True  # 开发时设置为True 线上环境设置为False
+DEBUG = False  # 开发时设置为True 线上环境设置为False
 
 
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 
-
+# 测试下提交
 # 配置请求体大小100m 处理跨域的问题
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 CORS_ORIGIN_ALLOW_ALL = True
@@ -113,8 +113,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'extend',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'huojian',
+        'PASSWORD': 'Jieyun2019.com',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

@@ -198,6 +198,7 @@ class ChargeSumView(generics.GenericAPIView):
         today = datetime.date.today()
         start_time = self.request.query_params.get('start_time', today - datetime.timedelta(days=7))
         end_time = self.request.query_params.get('end_time', today)
+        #end_time = datetime.strptime(end_time, '%Y-%m-%d') + datetime.timedelta(days=1) # 这里加一天，要不然必须输入2020-12-27，2020-12-28才能查询出2020-12-27的数据
         game_id = self.request.query_params.get('game_id', None)
         user_id = self.request.query_params.get('user_id', None)
         select = {'day': connection.ops.date_trunc_sql('day', 'charge_time')} # 按天统计归档
