@@ -25,13 +25,13 @@
       stripe
       style="width: 100%">
       <el-table-column prop="id" label="ID"/>
-				<el-table-column prop="username" label="用户名"/>
-				<el-table-column prop="phone" label="手机号"/>
-				<el-table-column prop="email" label="邮箱"/>
-				<el-table-column prop="real_name" label="姓名"/>
-				<el-table-column prop="group.group_type" label="角色"/>
-				<el-table-column prop="bf_logo_time" label="上次登录时间"/>
-				
+			<el-table-column prop="username" label="用户名"/>
+			<el-table-column prop="phone" label="手机号"/>
+			<el-table-column prop="email" label="邮箱"/>
+			<el-table-column prop="real_name" label="姓名"/>
+			<el-table-column prop="group.group_type" label="角色"/>
+      <el-table-column prop="auth.auth_type" label="权限"/>
+			<el-table-column prop="bf_logo_time" label="上次登录时间"/>
       <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
           <el-button size="small" v-if="canEditUser" @click="edit_data(scope.row)">编辑</el-button>

@@ -75,7 +75,7 @@ class LoginView(generics.GenericAPIView):
                 return Response({"message": "用户不存在", "errorCode": 2, "data": {}})
             if user.status == '0':
                 return Response({"message": "账号被冻结，无法登录。", "errorCode": 2, "data": {}})
-            if user.password == password:
+            if hashlib.md5(user.password.encode(encoding='UTF-8')).hexdigest() == password:
                 payload = jwt_payload_handler(user)
                 token = jwt_encode_handler(payload)
                 data = jwt_response_payload_handler(token, user, request)
