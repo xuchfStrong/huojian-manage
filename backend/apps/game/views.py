@@ -147,7 +147,7 @@ class ChargeViewset(ModelViewSet):
                 user_id = self.request.query_params.get('user')
                 queryset = Charge.objects.filter(user_id=user_id).order_by('-update_time')
             else:
-                queryset = Charge.objects.all()
+                queryset = Charge.objects.all().order_by('-update_time')
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
                 '''
                 找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
