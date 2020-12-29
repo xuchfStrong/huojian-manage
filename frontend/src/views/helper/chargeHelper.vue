@@ -198,6 +198,7 @@ export default {
 
     // 格式化用于复制的结果
     formatResult() {
+      this.copyText = ''
       if (this.result && this.result.length > 0) {
         this.result.forEach(item => {
           this.copyText += item + '\n'
@@ -271,10 +272,10 @@ export default {
     // 清空结果
     clearResult() {
       this.result = []
-      this.$refs[formName].resetFields()
+      this.showResult = false
+      this.$refs['formName'].resetFields()
       // this.ruleForm = Object.assign({}, defaultRuleForm)
       // this.ruleForm.chargetype = this.chargetypeList[0].id
-      this.showResult = false
     },
 
     // // form数据验证
