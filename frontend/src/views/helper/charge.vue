@@ -2,8 +2,9 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" size="mini" class="search_form_wrapper_small" label-width="80px"  label-position="right">
-      <el-form-item label="" class="btn-form-item">
+      <el-form-item label="" class="btn-form-item" style="margin-right:0px;">
         <el-button type="primary" size="mini" @click="to_search">搜索</el-button>
+        <el-button v-if="isCanExport" type="primary" size="mini" @click="export_xls">导出</el-button>
       </el-form-item>
       
       <el-form-item label="游戏:" >
@@ -56,6 +57,16 @@
           placeholder="充值结束日期"
           class="time-picker">
         </el-date-picker>
+      </el-form-item>
+      <el-form-item label="充值类型:">
+        <el-select size="mini" v-model="my_pagination.chargetype" placeholder="请选择用户" filterable clearable style="width: 100%;">
+          <el-option
+            v-for="item in chargetypeList"
+            :key="item.id"
+            :label="item.type_name_cn"
+            :value="item.id">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="关键字">
         <el-input clearable v-model="my_pagination.search" placeholder="模糊搜索关键字"/>
@@ -158,6 +169,7 @@
 
 <script>
 import store from '@/store'
+import { exportXls } from '@/api/export'
 import { GetAjax, PostAjax, PatchAjax, DeleteAjax } from '@/api/myapi'
 import Mysearch from '@/components/SearchField/index2.vue'
 import Pagination from '@/components/Pagination'
@@ -198,6 +210,7 @@ export default {
       currentRow: {},
       gameList: [],
       userList: [],
+      chargetypeList: [],
       my_pagination: {
         page: 1,
         page_size: 10,
@@ -213,6 +226,9 @@ export default {
   computed: {
     isGetUser() {
       return ['SuperAdmin', 'Admin'].includes(this.$store.getters.user_obj.group.group_type) || this.$store.getters.auth_json.user.auth_list
+    },
+    isCanExport() {
+      return ['SuperAdmin'].includes(this.$store.getters.user_obj.group.group_type)
     }
   },
 
@@ -220,6 +236,7 @@ export default {
     this.get_need_data(this.my_pagination)
     this.get_authGame_data()
     this.get_user_data()
+    this.get_chargetype_data()
   },
 
   methods: {
@@ -255,6 +272,14 @@ export default {
       if (this.isGetUser) {
         GetAjax('/user/', params).then(response => {
           this.userList = response.data
+        })
+      }
+    },
+
+    get_chargetype_data(params) {
+      if (this.isGetUser) {
+        GetAjax('/chargetype/', params).then(response => {
+          this.chargetypeList = response.data
         })
       }
     },
@@ -327,6 +352,17 @@ export default {
       this.my_pagination.page = 1
       this.my_pagination.search_type = val
       this.get_need_data(this.my_pagination)
+    },
+
+    export_xls() {
+      const exportParams =  JSON.parse(JSON.stringify(this.my_pagination))
+      delete exportParams.page
+      delete exportParams.page_size
+      delete exportParams.count
+      delete exportParams.search
+      delete exportParams.search_type
+      const export_url = process.env.BASE_API + '/exportCharge/'
+      exportXls(exportParams, export_url, 'charge.xlsx')
     }
   }
 }

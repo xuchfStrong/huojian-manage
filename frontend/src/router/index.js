@@ -26,7 +26,7 @@ export const constantRouterMap = [
       {
         path: 'demo',
         name: 'demo',
-        component: () => import('@/views/myviews/demoadmin'),
+        component: () => import('@/views/myviews/demoadmin01'),
         meta: { title: 'demo admin', icon: 'form' }
       }
     ]

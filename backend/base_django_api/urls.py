@@ -1,6 +1,6 @@
 from base.views import UploadFile, Tests, BeginCelery
 from user.views import LoginView, UserViewset, UserInfo, AuthViewset, UserDictExportViewset
-from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView
+from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView, ChargeExportViewset
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -25,7 +25,7 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 # 账号管理
 router.register(r'user', UserViewset, base_name='账号管理')
-router.register(r'confdictexport', UserDictExportViewset, base_name='账号导出')
+router.register(r'exportUser', UserDictExportViewset, base_name='账号导出')
 # 权限管理
 router.register(r'auth', AuthViewset, base_name='权限管理')
 from flow.views import FlowGroupViewset, ApprovalFlowViewset, FlowBodyViewset, FlowGroupListViewset, FlowBodyNeedFlowViewset, ObjectFlowView
@@ -42,6 +42,7 @@ router.register(r'game', GameViewset, base_name='游戏管理')
 router.register(r'authGame', AuthGameViewset, base_name='游戏权限管理')
 router.register(r'chargetype', ChargeTypeViewset, base_name='充值类型管理')
 router.register(r'charge', ChargeViewset, base_name='充值管理')
+router.register(r'exportCharge', ChargeExportViewset, base_name='充值导出')
 
 
 urlpatterns = [

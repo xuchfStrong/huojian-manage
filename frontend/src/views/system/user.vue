@@ -34,7 +34,7 @@
 				
       <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
-          <el-button size="small" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.user.auth_update" @click="edit_data(scope.row)">编辑</el-button>
+          <el-button size="small" v-if="canEditUser" @click="edit_data(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.user.auth_destroy"  @click="delete_data_fuc(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -234,6 +234,12 @@ export default {
       auth_datas: []
     }
   },
+  computed: {
+    canEditUser() {
+      return this.$store.getters.user_obj.group.group_type === 'SuperAdmin' || 
+      (this.$store.getters.auth_json.user.auth_update && this.$store.getters.auth_json.auth.auth_list)
+    }
+  },
   created: function() {
     this.get_need_data(this.my_pagination)
     this.get_auth_data()
@@ -248,6 +254,7 @@ export default {
       })
     },
     get_auth_data(params) {
+      if (!this.canEditUser) return
       GetAjax('/auth/', params).then(response => {
         const data = response.data
         console.log(data)

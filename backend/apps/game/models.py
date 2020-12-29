@@ -52,7 +52,7 @@ class ChargeType(SoftDeleteModel, BaseModel):
 
 class Charge(SoftDeleteModel, BaseModel):
   status_choices = (
-    (0, '未撤销'),
+    (0, '成功'),
     (1, '已撤销'),
     (2, '失败'),
   )

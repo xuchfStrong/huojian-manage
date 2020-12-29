@@ -47,6 +47,7 @@
         </el-date-picker>
       </el-form-item>
     </el-form>
+    <div class="tips">提示：默认统计最近7天的数据，不包括当天。如果要查询2020-12-27日的数据，开始时间输入2020-12-27，结束时间输入2020-12-28。</div>
     <el-table
       :data="page_datas"
       show-summary
@@ -175,7 +176,7 @@ export default {
   width: 150px;
 }
 .tips {
-  margin: 10px 0 0 30px;
+  margin: 10px 0 10px 5px;
   font-size: 12px;
   color: #909399;
 }

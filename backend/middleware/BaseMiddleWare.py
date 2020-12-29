@@ -65,8 +65,9 @@ class FormatReturnJsonMiddleware(object):
                 response._is_rendered = False
                 response.render()
             else:
+                # 导出的接口 confdictexport 必须添加到这个判断中。导出的接口不需要进入下面的处理逻辑
                 if request.path is not '/' and not re.match(r'/swagger.*', request.path, re.I) and not re.match(r'/redoc/.*', request.path, re.I) and not re.match(r'/export.*', request.path, re.I):
-                    # 适配不分页返回数据的格式化
+                    # 适配不分页返回数据的格式化,
                     if type(response.data) == utils.serializer_helpers.ReturnList:
                         data = {"message": 'ok', "errorCode": 0,"data": response.data}
                         response.data = data

@@ -71,7 +71,7 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
 
     class Meta:
         model = Charge  # 关联的表
-        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid']  # 过滤的字段
+        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype',]  # 过滤的字段
 
     # @property
     # def qs(self):
@@ -170,6 +170,77 @@ class ChargeViewset(ModelViewSet):
             return Response({"errorCode": 1, "message": instance.message})
 
 
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from drf_renderer_xlsx.mixins import XLSXFileMixin
+from drf_renderer_xlsx.renderers import XLSXRenderer
+class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
+    queryset = Charge.objects.all()
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = [BaseAuthPermission, ]
+    serializer_class = ExportChargeSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class  = ChargeFilter
+    renderer_classes = (XLSXRenderer,)
+    filename = 'charge_export.xlsx'
+
+
+    def get_queryset(self):
+        '''
+        因为搜索这里如果是超级管理员，需要能够进行搜索全部用户的，
+        Admin用户能够搜索自己有权限游戏的所有记录
+        而代理只能搜索自己的记录
+        '''
+        if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
+            if bool(self.request.query_params.get('user')):
+                user_id = self.request.query_params.get('user')
+                queryset = Charge.objects.filter(user_id=user_id)
+            else:
+                queryset = Charge.objects.all().order_by('-update_time')
+        elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
+                '''
+                找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
+                '''
+                qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
+                queryset = Charge.objects.filter(game_id__in = qs_game)
+        elif bool(self.request.auth):
+            queryset = Charge.objects.filter(user_id=self.request.user.id)
+        else:
+            queryset = Charge.objects.filter(id=0)
+        return queryset
+    
+    column_header = {
+        'height': 20,
+        'column_width': [10, 14, 14, 14, 14, 14, 14, 14, 14, 14, 22, 22, 14, 22, 14, 22,],
+    }
+
+    body = {
+        'style': {
+            # 'fill': {
+            #     'fill_type': 'solid',
+            #     'start_color': 'FFCCFFCC',
+            # },
+            # 'alignment': {
+            #     'horizontal': 'left',
+            #     'vertical': 'center',
+            #     'wrapText': True,
+            #     'shrink_to_fit': True,
+            # },
+            # 'border_side': {
+            #     'border_style': 'thin',
+            #     'color': 'FF000000',
+            # },
+            # 'font': {
+            #     'name': 'Arial',
+            #     'size': 12,
+            #     'bold': False,
+            #     'color': 'FF000000',
+            # }
+        },
+        'height': 20,
+    }
+
+
+
 class ChargeSumView(generics.GenericAPIView):
     '''
     根据时间段汇总充值数据
@@ -225,7 +296,7 @@ class QueryGameUserView(generics.GenericAPIView):
     authentication_classes = (JWTAuthentication,)
     permission_classes = [BaseAuthPermission, ]
 
-    # 这里定义的为post，就只能用post方法
+    # 这里定义的为get，就只能用get方法;如果想要支持post方法，就得定义对应的函数post
     def get(self, request):
         try:
             serializer = self.get_serializer(data=request.query_params)

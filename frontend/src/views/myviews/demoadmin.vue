@@ -228,7 +228,7 @@ export default {
     }
   },
   created: function() {
-    this.get_need_data(this.my_pagination)
+    // this.get_need_data(this.my_pagination)
   },
   methods: {
     get_need_data(params) {

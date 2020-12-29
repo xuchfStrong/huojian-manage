@@ -33,8 +33,9 @@ class BaseAuthPermission(object):
     
     def need_auth_list_check(self, auth_name):
         # 只需登录白名单
-        if auth_name in ['userinfo', 'export*', 'querGameUser', 'chargeSum' ]:
+        if auth_name in ['userinfo', 'export*', 'querGameUser', 'chargeSum']:
             return True
+
         else:
             return False
 
@@ -56,6 +57,9 @@ class BaseAuthPermission(object):
         if request.user.group.group_type in ['SuperAdmin', 'Admin', 'NormalUser'] and admin_auth:
             if view.action in ['list', 'retrieve']:
                 # 查看权限
+                if request.user.group.group_type in ['Admin'] and auth_name == 'user':
+                    # 如果是Admin组，都可以获取user信息，不需要设置auth_list=True
+                    return True
                 return bool(admin_auth.auth_list == True)
             elif view.action == 'create':
                 # 创建权限

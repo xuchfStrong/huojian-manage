@@ -198,6 +198,30 @@ class ReturnChargeSerializer(serializers.ModelSerializer):
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)
 
 
+# 导出充值信息
+class ExportChargeSerializer(serializers.ModelSerializer):
+    game_name_cn = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    chargetype = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Charge
+        exclude = ('deleted', 'sort_time', 'create_time', 'update_time', 'sort', 'result', 'user', 'game')
+
+    def get_game_name_cn(self, obj):
+        return obj.game.game_name_cn
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    def get_chargetype(self, obj):
+        return obj.chargetype.type_name_cn
+
+    def get_status(self, obj):
+        return obj.get_status_display()
+
+
 # 查询单个用户的辅助信息表单验证
 class QueryGameUserViewSerializer(serializers.Serializer):
     '''

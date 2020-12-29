@@ -57,7 +57,7 @@
     </el-table>
     <br>
     <pagination :total="page_tatol" :page.sync="my_pagination.page" :page_size.sync="my_pagination.page_size" @pagination="pag_change"/>
-    <tinymce :upload-url="action_url" v-model="tt_html"/>
+    <!-- <tinymce :upload-url="action_url" v-model="tt_html"/> -->
     <el-button size="small" @click="look_tinymce">查看</el-button>
     <el-button size="small" @click="export_xls">导出</el-button>
 
@@ -181,12 +181,12 @@ import { exportXls } from '@/api/export'
 import datetime from 'date-and-time'
 import Pagination from '@/components/Pagination'
 import Mysearch from '@/components/SearchField'
-import Tinymce from '@/components/Tinymce'
+// import Tinymce from '@/components/Tinymce'
 import axios from 'axios'
 
 export default {
   name: 'DemoManage',
-  components: { Pagination, Mysearch, Tinymce },
+  components: { Pagination, Mysearch },
   data() {
     return {
       centerDialogVisible: false,
@@ -264,7 +264,7 @@ export default {
     }
   },
   created: function() {
-    this.get_need_data(this.my_pagination)
+    // this.get_need_data(this.my_pagination)
   },
   methods: {
     get_need_data(params) {
@@ -413,7 +413,7 @@ export default {
       console.log('查看富文本：', this.tt_html)
     },
     export_xls() {
-      const export_url = process.env.BASE_API + '/confdictexport/'
+      const export_url = process.env.BASE_API + '/exportUser/'
       exportXls({}, export_url, 'test.xlsx')
     }
   }
