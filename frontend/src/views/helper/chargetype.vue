@@ -19,6 +19,7 @@
       style="width: 100%">
 			<el-table-column prop="type_name_cn" label="类型名称"/>
       <el-table-column prop="type_name" label="类型代码"/>
+      <el-table-column prop="sort" label="排序"/>
       <el-table-column prop="vip" label="辅助类型">
         <template slot-scope="scope">
           {{ scope.row.vip | typeFilter }}
@@ -62,6 +63,9 @@
           </el-form-item>
           <el-form-item label="类型代码" prop="type_name">
             <el-input size="small" v-model="ruleForm.type_name"/>
+          </el-form-item>
+          <el-form-item label="排序" prop="sort">
+            <el-input size="small" v-model.number="ruleForm.sort"/>
           </el-form-item>
           <el-form-item label="辅助类型" prop="vip">
             <el-select size="small" v-model="ruleForm.vip" placeholder="请选择辅助类型" filterable clearable style="width: 100%;">
@@ -119,6 +123,9 @@
           </el-form-item>
           <el-form-item label="类型代码" prop="type_name">
             <el-input size="small" v-model="ruleForm_patch.type_name"/>
+          </el-form-item>
+          <el-form-item label="排序" prop="sort">
+            <el-input size="small" v-model.number="ruleForm_patch.sort"/>
           </el-form-item>
           <el-form-item label="辅助类型" prop="vip">
             <el-select size="small" v-model="ruleForm_patch.vip" placeholder="请选择辅助类型" filterable clearable style="width: 100%;">
@@ -185,6 +192,7 @@ export default {
       ruleForm: {
         type_name_cn: '',
         type_name: '',
+        sort: null,
         vip: '',
         decide_type: '',
         charge_value: '',

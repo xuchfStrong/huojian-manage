@@ -60,23 +60,36 @@ class ChargeTypeViewset(ModelViewSet):
     pagination_class = Pagination
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     search_fields = ('type_name', 'type_name_cn')
+    ordering_fields = ('sort',)
+
+    def get_queryset(self):
+        queryset = ChargeType.objects.all().order_by('sort')
+        return queryset
 
 
 class ChargeFilter(django_filters.rest_framework.FilterSet):
     """自定义充值的过滤类"""
+    '''
+    对于 django_filters.DateTimeFilter 在执行 SQL 时会把前端的时间参数当成是东八区时间然后转为 UTC 时区时间
+    查询url为http://127.0.0.1:8000/charge/?start_time=2020-12-22 00:00:00&end_time=2020-12-23 00:00:00
+    上面的和下面的效果一样http://127.0.0.1:8000/charge/?start_time=2020-12-22&end_time=2020-12-23 00:00:00
+    '''
     start_time = django_filters.DateTimeFilter(field_name="charge_time",lookup_expr="gte")
-    end_time = django_filters.DateTimeFilter(field_name="charge_time",lookup_expr="lte")
-    # 查询url为http://127.0.0.1:8000/charge/?start_time=2020-12-22 00:00:00&end_time=2020-12-23 00:00:00
-    # 上面的和下面的效果一样http://127.0.0.1:8000/charge/?start_time=2020-12-22&end_time=2020-12-23 00:00:00
+    # end_time = django_filters.DateTimeFilter(field_name="charge_time",lookup_expr="lte")
+
+
+    '''
+    下面的方式是自定义查询的方式，目的将end_tim加一天。
+    要不然这种情况http://127.0.0.1:8000/charge/?start_time=2020-12-22&end_time=2020-12-22就查询不到2020-12-22的数据
+    '''
+    end_time = django_filters.DateTimeFilter(field_name="charge_time", method='filter_end_time')
+    def filter_end_time(self, queryset, name, value):
+        end_time = value + datetime.timedelta(days=1)
+        return queryset.filter(Q(charge_time__lte = end_time))
 
     class Meta:
         model = Charge  # 关联的表
         fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype',]  # 过滤的字段
-
-    # @property
-    # def qs(self):
-    #     print('qssssssssssssss')
-    #     pass
 
 
 class ChargeViewset(ModelViewSet):
@@ -95,9 +108,23 @@ class ChargeViewset(ModelViewSet):
     pagination_class = Pagination
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filter_class  = ChargeFilter
-    search_fields = ('charge_value', 'days', 'server_id', 'userid',) # 搜索功能对应的字段,查询参数为search，http://127.0.0.1:8000/charge/?search=30 模糊匹配 # '^' Starts-with search；'=' Exact matches.
+    search_fields = ( 'server_id', 'userid',) # 搜索功能对应的字段,查询参数为search，http://127.0.0.1:8000/charge/?search=30 模糊匹配 # '^' Starts-with search；'=' Exact matches.
     filter_fields = ('charge_value', 'days', 'server_id', 'userid',) # 用于精确搜索的字段，DjangoFilterBackend提供的功能, 因为前面用了自定义filter_class，这里就不生效了。自定义的filter_class生效
     ordering_fields = ('update_time', 'create_time',)
+    '''
+    如果有ordering_fields
+        url输入的是该字段，就按该字段排序（ordering_fields必须是可以参与order_by()的字段，否则会报错）否则不排序
+    
+    如果ordering_fields = '__all__':
+        1. 如 url:/ordering = -sdfsfd，则 ordering = None，不排序
+        2. 如 url:/ordering = -update_time, 则 ordering = -update_time，按-update_time
+    
+    如果没有指定ordering_fields,
+        1. 不参与序列化，如：sdsadf。则 ordering = None，不排序
+        2. 参与序列化且是表字段，如：price，则 ordering = price, 按price排序，
+        3. 参与序列化不是表字段，如：brand_name, 则 ordering = brand_name,报错（order_by(brand_name)出错）
+    '''
+
 
     def get_serializer_class(self):
         print('ChargeViewset')
@@ -118,19 +145,19 @@ class ChargeViewset(ModelViewSet):
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             if bool(self.request.query_params.get('user')):
                 user_id = self.request.query_params.get('user')
-                queryset = Charge.objects.filter(user_id=user_id)
+                queryset = Charge.objects.filter(user_id=user_id).order_by('-update_time')
             else:
-                queryset = Charge.objects.all().order_by('-update_time')
+                queryset = Charge.objects.all()
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
                 '''
                 找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
                 '''
                 qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
-                queryset = Charge.objects.filter(game_id__in = qs_game)
+                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-update_time')
         elif bool(self.request.auth):
-            queryset = Charge.objects.filter(user_id=self.request.user.id)
+            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-update_time')
         else:
-            queryset = Charge.objects.filter(id=0)
+            queryset = []
         # 如果不用filter_class自定义时间过滤，也可以通过下面的方法进行过滤
         # start_time = self.request.query_params.get('start_time', None)
         # end_time = self.request.query_params.get('end_time', None)
@@ -193,7 +220,7 @@ class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             if bool(self.request.query_params.get('user')):
                 user_id = self.request.query_params.get('user')
-                queryset = Charge.objects.filter(user_id=user_id)
+                queryset = Charge.objects.filter(user_id=user_id).order_by('-update_time')
             else:
                 queryset = Charge.objects.all().order_by('-update_time')
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
@@ -201,9 +228,9 @@ class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
                 找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
                 '''
                 qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
-                queryset = Charge.objects.filter(game_id__in = qs_game)
+                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-update_time')
         elif bool(self.request.auth):
-            queryset = Charge.objects.filter(user_id=self.request.user.id)
+            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-update_time')
         else:
             queryset = Charge.objects.filter(id=0)
         return queryset
@@ -240,7 +267,6 @@ class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
     }
 
 
-
 class ChargeSumView(generics.GenericAPIView):
     '''
     根据时间段汇总充值数据
@@ -268,8 +294,12 @@ class ChargeSumView(generics.GenericAPIView):
         '''
         today = datetime.date.today()
         start_time = self.request.query_params.get('start_time', today - datetime.timedelta(days=7))
-        end_time = self.request.query_params.get('end_time', today)
-        #end_time = datetime.strptime(end_time, '%Y-%m-%d') + datetime.timedelta(days=1) # 这里加一天，要不然必须输入2020-12-27，2020-12-28才能查询出2020-12-27的数据
+        has_end_time = self.request.query_params.get('end_time', None)
+        if has_end_time:
+            # 这里加一天，要不然必须输入2020-12-27，2020-12-28才能查询出2020-12-27的数据
+            end_time = datetime.datetime.strptime(self.request.query_params.get('end_time'), '%Y-%m-%d') + datetime.timedelta(days=1)
+        else:
+            end_time = today
         game_id = self.request.query_params.get('game_id', None)
         user_id = self.request.query_params.get('user_id', None)
         select = {'day': connection.ops.date_trunc_sql('day', 'charge_time')} # 按天统计归档
