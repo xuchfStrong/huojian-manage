@@ -46,7 +46,7 @@ class AuthGameViewset(ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.group.group_type in ['SuperAdmin']:
-            queryset = AuthGame.objects.all()
+            queryset = AuthGame.objects.all().order_by('auth_id')
             return queryset
         else:
             return AuthGame.objects.filter(auth_id=self.request.user.auth_id)

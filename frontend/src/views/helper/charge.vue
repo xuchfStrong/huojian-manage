@@ -159,7 +159,7 @@
       title="充值详情"
       width="350px"
       center>
-      <div>
+      <div class="content-wrap">
         <p v-for="(item, index) in currentResult" :key="index">{{item}}</p>
       </div>
     </el-dialog>
@@ -382,5 +382,9 @@ export default {
   margin: 10px 0 0 30px;
   font-size: 12px;
   color: #909399;
+}
+.content-wrap {
+	user-select: text;
+	word-break: break-all;
 }
 </style>
