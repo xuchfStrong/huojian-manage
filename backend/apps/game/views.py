@@ -17,6 +17,7 @@ from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPer
 from .models import *
 from .serializers import *
 from .filters import *
+from user.models import User
 
 
 class GameViewset(ModelViewSet):
@@ -363,4 +364,17 @@ class QueryGameUserView(generics.GenericAPIView):
         except Exception as e:
             print(e)
 
-  
+
+class UserOfAuthView(generics.GenericAPIView):
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = [BaseAuthPermission, ]
+
+    def get(self, request):
+        try:
+            auth_id = request.user.auth.id
+            qs1 = AuthGame.objects.filter(auth_id = auth_id).values('game_id')
+            qs2 = AuthGame.objects.filter(game_id__in = qs1).values('auth_id')
+            qs3 = User.objects.filter(auth_id__in = qs2).values('username', 'id')
+            return Response({"message": '操作成功', "errorCode": 0, "data": qs3})
+        except Exception as e:
+            return Response({"message": "出现了无法预料的view视图错误：%s" % e, "errorCode": 1, "data": {}})

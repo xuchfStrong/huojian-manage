@@ -1,6 +1,6 @@
 from base.views import UploadFile, Tests, BeginCelery
 from user.views import LoginView, UserViewset, UserInfo, AuthViewset, UserDictExportViewset
-from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView, ChargeExportViewset
+from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView, ChargeExportViewset,UserOfAuthView
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -58,4 +58,5 @@ urlpatterns = [
     path('toflow/', ObjectFlowView.as_view(), name='审批操作'),
     path('querGameUser/', QueryGameUserView.as_view(), name='查询单个用户辅助信息'),
     path('chargeSum/', ChargeSumView.as_view(), name='查询单个用户辅助信息'),
+    path('userofauth/', UserOfAuthView.as_view(), name='根据管理的游戏查询对应的用户'),
 ]

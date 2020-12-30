@@ -122,7 +122,7 @@ export default {
 
     get_user_data(params) {
       if (this.isGetUser) {
-        GetAjax('/user/', params).then(response => {
+        GetAjax('/userofauth/', params).then(response => {
           this.userList = response.data
         })
       }

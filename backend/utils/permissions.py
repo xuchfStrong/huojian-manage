@@ -31,11 +31,12 @@ class AllowAllPermission(object):
 
 class BaseAuthPermission(object):
     
-    def need_auth_list_check(self, auth_name):
+    def need_auth_list_check(self, auth_name, request):
         # 只需登录白名单
         if auth_name in ['userinfo', 'export*', 'querGameUser', 'chargeSum']:
             return True
-
+        elif auth_name in ['userofauth'] and request.user.group.group_type in ['Admin']:
+            return True
         else:
             return False
 
@@ -51,7 +52,7 @@ class BaseAuthPermission(object):
         if request.user.group.group_type == 'SuperAdmin':
             return True
         # 访问只需登录路由时
-        if self.need_auth_list_check(auth_name):
+        if self.need_auth_list_check(auth_name, request):
             return True
         admin_auth = AuthPermission.objects.filter(object_name=auth_name, auth_id=request.user.auth_id).first()
         if request.user.group.group_type in ['SuperAdmin', 'Admin', 'NormalUser'] and admin_auth:
