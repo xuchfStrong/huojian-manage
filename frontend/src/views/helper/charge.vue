@@ -277,11 +277,9 @@ export default {
     },
 
     get_chargetype_data(params) {
-      if (this.isGetUser) {
-        GetAjax('/chargetype/', params).then(response => {
-          this.chargetypeList = response.data
-        })
-      }
+      GetAjax('/chargetype/', params).then(response => {
+        this.chargetypeList = response.data
+      })
     },
 
     get_need_data(params) {
