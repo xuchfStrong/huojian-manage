@@ -16,11 +16,11 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
       <el-table-column prop="id" label="ID" width="70"/>
 			<el-table-column prop="game_name_cn" label="游戏名称"/>
       <el-table-column prop="auth_type" label="权限"/>
-				
       <el-table-column label="操作" align="center">
         <template slot-scope="scope" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.authGame.auth_update">
           <el-button size="mini" @click="edit_data(scope.row)">编辑</el-button>

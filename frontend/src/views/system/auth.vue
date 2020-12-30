@@ -23,6 +23,7 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
       <el-table-column prop="id" label="ID"/>
 			<el-table-column prop="auth_type" label="权限名称"/>

@@ -23,6 +23,7 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
       <el-table-column prop="id" label="ID"/>
 			<el-table-column prop="username" label="用户名"/>

@@ -16,6 +16,7 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
 			<el-table-column prop="type_name_cn" label="类型名称"/>
       <el-table-column prop="type_name" label="类型代码"/>

@@ -16,6 +16,7 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
 			<el-table-column prop="game_name_cn" label="游戏名"/>
       <el-table-column prop="game_name" label="游戏代码"/>

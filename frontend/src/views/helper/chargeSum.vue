@@ -50,6 +50,7 @@
     <div class="tips">提示：默认统计最近7天的数据，不包括当天。</div>
     <el-table
       :data="page_datas"
+      size="mini"
       show-summary
       border
       stripe
