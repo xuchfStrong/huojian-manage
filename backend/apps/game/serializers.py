@@ -7,6 +7,7 @@ from .models import *
 from user.models import Auth
 import json
 import requests
+import datetime
 
 # 游戏序列化器
 class GameSerializer(serializers.ModelSerializer):
@@ -145,10 +146,15 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
     # 这里把user添加到参数中，让请求中能够有user信息。
     def validate(self, attrs):
         attrs['user'] = self.context['request'].user
+        now = datetime.datetime.now()
+        this_week_start = now - datetime.timedelta(days=now.weekday())
+        this_week_start_date = this_week_start.date()
         if self.instance.status == 1:
             raise serializers.ValidationError("已经撤回的记录,无法撤回。")
         elif self.instance.status == 2:
             raise serializers.ValidationError("充值失败的记录无法撤回。")
+        elif self.instance.charge_time.date() < this_week_start_date:
+            raise serializers.ValidationError("只能撤回本周的记录。")
         '''
         # 下面的操作没必要，因为在ChargeViewset的get_queryset中已经进行了过滤，如果操作的记录
         # 不是自己的user_id就会报错未找到。

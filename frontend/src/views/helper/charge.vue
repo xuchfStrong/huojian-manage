@@ -71,7 +71,7 @@
       <el-form-item label="关键字">
         <el-input clearable v-model="my_pagination.search" placeholder="模糊搜索关键字"/>
       </el-form-item>
-      <div class="tips">提示：可以输入部分服务器ID或者辅助ID到关键字框进行模糊搜索。</div>
+      <div class="tips">提示：可以输入部分服务器ID或者辅助ID到关键字框进行模糊搜索;只能撤回本周的记录。</div>
     </el-form>
 
     <!-- <br> -->

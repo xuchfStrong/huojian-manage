@@ -111,7 +111,7 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const data = response.data
-          console.log(data)
+          // console.log(data)
           commit('SET_USER_OBJ', data)
           commit('SET_NAME', data.username)
           commit('SET_ROLES', data.group.group_type)

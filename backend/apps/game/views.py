@@ -68,7 +68,7 @@ class ChargeTypeViewset(ModelViewSet):
 
 
 class ChargeFilter(django_filters.rest_framework.FilterSet):
-    """自定义充值的过滤类"""
+    """自定义充值的过滤类,会先经过ChargeViewset中的get_queryset，然后才到这里"""
     '''
     对于 django_filters.DateTimeFilter 在执行 SQL 时会把前端的时间参数当成是东八区时间然后转为 UTC 时区时间
     查询url为http://127.0.0.1:8000/charge/?start_time=2020-12-22 00:00:00&end_time=2020-12-23 00:00:00

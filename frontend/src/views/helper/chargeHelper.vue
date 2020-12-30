@@ -42,7 +42,7 @@
 
       <div style="text-align:center;">
         <el-button type="primary" @click="queryUser()">查询</el-button>
-        <el-button type="primary" @click="submitForm()">充值</el-button>
+        <el-button type="primary" :loading="chargeLoding" @click="submitForm()">充值</el-button>
       </div>
 
       <div v-if="showResult" class="result-wrap">
@@ -95,6 +95,7 @@ export default {
       centerDialog_post: false,
       centerDialog_delete: false,
       centerDialog_patch: false,
+      chargeLoding: false,
       chargetypeList: [],
       gameList: [],
       customTypeChecked: false,
@@ -182,7 +183,9 @@ export default {
         delete params.charge_value
         delete params.content
       }
+      this.chargeLoding = true
       PostAjax('/charge/', params).then(response => {
+        this.chargeLoding = false
         const data = response.data
         // this.$refs['ruleForm'].resetFields()
         this.result = JSON.parse(data.result.replace(/'/g, '"'))
@@ -193,6 +196,9 @@ export default {
           message: "充值成功！",
           type: 'success'
         })
+      }).catch(err => {
+        console.log('err', err)
+        this.chargeLoding = false
       })
     },
 

@@ -30,9 +30,9 @@ service.interceptors.response.use(
     /**
      * code为非20000是抛错 可结合自己业务进行修改
      */
-    console.log('response拦截器开始拦截')
-    console.log(response.data)
-    console.log('response拦截器结束拦截(会拦截所有response)')
+    // console.log('response拦截器开始拦截')
+    // console.log(response.data)
+    // console.log('response拦截器结束拦截(会拦截所有response)')
     const res = response.data
 
     if (response.status === 201) {
@@ -59,6 +59,7 @@ service.interceptors.response.use(
           message: res.message,
           type: 'error'
         });
+        return Promise.reject(res)
       } else {
         return response.data
       }
