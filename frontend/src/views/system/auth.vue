@@ -269,7 +269,6 @@ export default {
     get_need_data(params) {
       GetAjax('/auth/', params).then(response => {
         const data = response.data
-        console.log(data)
         this.page_datas = data
         this.my_pagination.count = response.count
       })
@@ -277,7 +276,6 @@ export default {
     post_need_data(data) {
       PostAjax('/auth/', data).then(response => {
         const data = response.data
-        console.log(data)
         this.centerDialog = false
         this.$refs['ruleForm'].resetFields()
         this.$message({
@@ -291,7 +289,6 @@ export default {
     patch_need_data(data) {
       PatchAjax('/auth/' + data.id + '/', data).then(response => {
         const data = response.data
-        console.log(data)
         this.centerDialog_patch = false
         // this.$refs['ruleForm_path'].resetFields()
         this.$message({
@@ -305,7 +302,6 @@ export default {
     delete_need_data(data) {
       DeleteAjax('/auth/' + data.id + '/', data).then(response => {
         const data = response.data
-        console.log(data)
         this.centerDialog_delete = false
         this.$message({
           showClose: true,
@@ -321,10 +317,8 @@ export default {
           if (formName == 'ruleForm') {
             // datetime.format(this.ruleForm.date, 'YYYY-MM-DD')
             // console.log(datetime.format(this.ruleForm.time, 'hh:mm:ss'))
-            console.log(this.ruleForm)
             this.post_need_data(this.ruleForm)
           } else {
-            console.log(this.ruleForm_patch)
             this.patch_need_data(this.ruleForm_patch)
           }
         } else {
@@ -335,14 +329,12 @@ export default {
     },
     // form数据验证
     resetForm(formName) {
-      console.log(formName)
       this.centerDialog = false
       this.centerDialog_patch = false
       this.$refs[formName].resetFields()
     },
     // 删除按钮
     delete_data_fuc(row) {
-      console.log(row)
       this.delete_data = row
       this.centerDialog_delete = true
     },
@@ -356,7 +348,6 @@ export default {
     },
     // 编辑按钮
     edit_data(row) {
-      console.log(row)
       this.ruleForm_patch = JSON.parse(JSON.stringify(row))
       for (var i in this.ruleForm.auth_permissions) {
         var is_have = false
@@ -375,25 +366,20 @@ export default {
     // 搜索层相关
     to_search() {
       this.my_pagination.page = 1
-      console.log(this.my_pagination.search)
       this.get_need_data(this.my_pagination)
     },
     pag_change() {
-      console.log(this.my_pagination)
       this.get_need_data(this.my_pagination)
     },
     search_change() {
-      console.log(this.my_pagination.search)
       this.get_need_data(this.my_pagination)
     },
     my_change(val) {
       this.my_pagination.page = 1
       this.my_pagination.search_type = val
-      console.log(this.my_pagination.search_type)
       this.get_need_data(this.my_pagination)
     },
     all_change(val) {
-      console.log(val)
       if (val) {
         for (var i in this.ruleForm.auth_permissions) {
           if (this.ruleForm.auth_permissions[i].auth_list != null) {

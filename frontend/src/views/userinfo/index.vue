@@ -4,6 +4,7 @@
       :data="page_datas"
       border
       stripe
+      size="mini"
       style="width: 100%">
       <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="realname" label="角色">
@@ -97,14 +98,12 @@ export default {
     get_need_data(params) {
       GetAjax('/userinfo/',params).then(response => {
         const data = response.data
-        console.log(data)
         this.page_datas = [data]
       })
     },
     patch_need_data(data) {
       PatchAjax('/user/' + data.id + '/', data).then(response => {
         const data = response.data
-        console.log(data)
         this.centerDialog_patch = false
         this.$refs['ruleForm_patch'].resetFields()
         this.$message({
@@ -119,7 +118,6 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (formName == 'ruleForm_patch') {
-            console.log(this.ruleForm_patch)
             this.patch_need_data(this.ruleForm_patch)
           }
         } else {
@@ -130,12 +128,10 @@ export default {
     },
     // form数据验证
     resetForm(formName) {
-      console.log(formName)
       this.centerDialog_patch = false
       this.$refs[formName].resetFields()
     },
     edit_data(row) {
-      console.log(row)
       this.ruleForm_patch = JSON.parse(JSON.stringify(row))
       this.ruleForm_patch.group = row.group.id
       if (row.auth) {

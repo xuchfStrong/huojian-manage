@@ -328,7 +328,7 @@ export default {
         const arrSp = this.parseText.split(',')
         this.ruleForm.server_id = arrSp[0].split(':')[1]
         this.ruleForm.userid = arrSp[1].split(':')[1]
-        const game_name = arrSp[2].split(':')[1]
+        const game_name = arrSp[2]? arrSp[2].split(':')[1] : ''
         this.findGameByName(game_name)
       }
       this.centerDialog_parse = false
@@ -336,7 +336,7 @@ export default {
 
     findGameByName(game_name) {
       const gameFind =  this.gameList.find(item => {
-        return item.game_name = game_name
+        return item.game_name == game_name
       })
       if (gameFind) {
         this.ruleForm.game = gameFind.game
