@@ -42,6 +42,7 @@
 
       <div style="text-align:center;">
         <el-button type="primary" @click="queryUser()">查询</el-button>
+        <el-button type="primary" @click="parseUser()">解析</el-button>
         <el-button type="primary" :loading="chargeLoding" @click="submitForm()">充值</el-button>
       </div>
 
@@ -66,6 +67,24 @@
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="centerDialog_post = false">取 消</el-button>
         <el-button size="small" type="primary" @click="true_post">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="centerDialog_parse"
+      v-dialogDrag
+      title="解析辅助ID"
+      width="350px"
+      center>
+      <el-input
+        v-model="parseText"
+        clearable
+        :rows=4
+        type="textarea"
+        placeholder="将辅助上复制的内容粘贴到这里进行自动解析辅助ID和服务器ID"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="centerDialog_parse = false">取 消</el-button>
+        <el-button size="mini" type="primary" @click="true_parse">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -95,12 +114,14 @@ export default {
       centerDialog_post: false,
       centerDialog_delete: false,
       centerDialog_patch: false,
+      centerDialog_parse: false,
       chargeLoding: false,
       chargetypeList: [],
       gameList: [],
       customTypeChecked: false,
       result: [],
       copyText: '',
+      parseText: '',
       showResult: false,
       ruleForm: Object.assign({}, defaultRuleForm),
       rules: {
@@ -294,6 +315,32 @@ export default {
     // 确定提交按钮
     true_post() {
       this.post_need_data(this.ruleForm)
+    },
+
+    // 自动解析
+    parseUser() {
+      this.centerDialog_parse = true
+      this.parseText = ''
+    },
+
+    true_parse() {
+      if (this.parseText) {
+        const arrSp = this.parseText.split(',')
+        this.ruleForm.server_id = arrSp[0].split(':')[1]
+        this.ruleForm.userid = arrSp[1].split(':')[1]
+        const game_name = arrSp[2].split(':')[1]
+        this.findGameByName(game_name)
+      }
+      this.centerDialog_parse = false
+    },
+
+    findGameByName(game_name) {
+      const gameFind =  this.gameList.find(item => {
+        return item.game_name = game_name
+      })
+      if (gameFind) {
+        this.ruleForm.game = gameFind.game
+      }
     }
   }
 }
@@ -323,6 +370,8 @@ export default {
     background: #F2F6FC;
     padding: 10px;
     margin-bottom: 10px;
+    user-select: text;
+	  word-break: break-all;
   }
 }
 </style>  

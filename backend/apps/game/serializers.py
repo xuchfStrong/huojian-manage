@@ -27,6 +27,7 @@ class AuthGameSerializer(serializers.ModelSerializer):
     # game_details = GameSerializer(source='game', read_only=True)
     # auth_details = ReturnBriefAuthSerializer(source='auth', read_only=True)
     game_name_cn = serializers.SerializerMethodField()
+    game_name = serializers.SerializerMethodField()
     auth_type = serializers.SerializerMethodField()
 
     class Meta:
@@ -35,6 +36,9 @@ class AuthGameSerializer(serializers.ModelSerializer):
 
     def get_game_name_cn(self, obj):
         return obj.game.game_name_cn
+
+    def get_game_name(self, obj):
+        return obj.game.game_name
 
     def get_auth_type(self, obj):
         return obj.auth.auth_type
@@ -170,7 +174,6 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
 
     def reset(self, instance):
         url = instance.game.reset_url
-        print('url', url)
         params = {
             'server_id': instance.server_id,
             'userid': instance.userid,
