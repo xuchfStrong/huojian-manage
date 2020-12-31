@@ -98,7 +98,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="server_id" label="服务器ID"/>
-      <el-table-column prop="userid" label="续费ID"/>
+      <el-table-column prop="userid" show-overflow-tooltip label="续费ID"/>
       <el-table-column prop="charge_value" label="金额" width="50"/>
       <el-table-column prop="days" label="天数" width="50"/>
       <el-table-column prop="status" label="状态" width="60">
