@@ -90,7 +90,7 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
 
     class Meta:
         model = Charge  # 关联的表
-        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype',]  # 过滤的字段
+        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype', 'user']  # 过滤的字段
 
 
 class ChargeViewset(ModelViewSet):
