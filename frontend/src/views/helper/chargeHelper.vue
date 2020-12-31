@@ -340,6 +340,8 @@ export default {
       })
       if (gameFind) {
         this.ruleForm.game = gameFind.game
+      } else {
+        this.ruleForm.game = null
       }
     }
   }
