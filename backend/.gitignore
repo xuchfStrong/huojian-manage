@@ -23,5 +23,6 @@ env.bak/
 venv.bak/
 .idea/
 .vscode
-.log
-.pid
+*.log
+*.pid
+*.status
