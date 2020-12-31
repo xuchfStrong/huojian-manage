@@ -145,7 +145,6 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
 
     # 这里把user添加到参数中，让请求中能够有user信息。
     def validate(self, attrs):
-        attrs['user'] = self.context['request'].user
         now = datetime.datetime.now()
         this_week_start = now - datetime.timedelta(days=now.weekday())
         this_week_start_date = this_week_start.date()
@@ -155,13 +154,8 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("充值失败的记录无法撤回。")
         elif self.instance.charge_time.date() < this_week_start_date:
             raise serializers.ValidationError("只能撤回本周的记录。")
-        '''
-        # 下面的操作没必要，因为在ChargeViewset的get_queryset中已经进行了过滤，如果操作的记录
-        # 不是自己的user_id就会报错未找到。
-        charge = Charge.objects.filter(id=self.instance.id).first()
-        if charge.user.id != self.context['request'].user.id:
-          raise serializers.ValidationError("无权操作。")
-        '''
+        # elif self.instance.user_id != self.context['request'].user.id:
+        #     raise serializers.ValidationError("只能撤回自己的记录。")
         return attrs
 
     def update(self, instance, validated_data):
@@ -170,6 +164,7 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
         if reset_res['code'] == 200:
             setattr(instance, 'status', 1)
             setattr(instance, 'charge_value', 0)
+            setattr(instance, 'reset_user', self.context['request'].user)
             instance.save()
         return instance
 
@@ -198,6 +193,7 @@ class ReturnChargeSerializer(serializers.ModelSerializer):
     game = GameSerializer()
     user = ReturnBriefUserSerializer()
     chargetype = ChargeTypeSerializer()
+    reset_user = ReturnBriefUserSerializer()
 
     class Meta:
         model = Charge

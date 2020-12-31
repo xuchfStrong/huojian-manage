@@ -71,6 +71,7 @@ class Charge(SoftDeleteModel, BaseModel):
   end_time = models.DateTimeField(null=True, blank=True, verbose_name='辅助到期时间')
   status = models.IntegerField(default=0, choices=status_choices, verbose_name='是否撤销')
   result = models.CharField(max_length=1000, null=True, blank=True,  verbose_name='充值结果')
+  reset_user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, verbose_name='撤销的用户')
 
   class Meta:
       db_table = 'A_Charge'

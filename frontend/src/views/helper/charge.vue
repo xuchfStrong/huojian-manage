@@ -162,6 +162,16 @@
       <div class="content-wrap">
         <p v-for="(item, index) in currentResult" :key="index">{{item}}</p>
       </div>
+      <div>
+        <div>
+          <span>状态:</span>
+          <span>{{ currentRow.status | statusFilter }}</span>
+        </div>
+        <div v-if="currentRow.status == 1 && currentRow.reset_user">
+          <span>撤销用户:</span>
+          <span>{{ currentRow.reset_user.username }}</span>
+        </div>
+      </div>
     </el-dialog>
 
   </div>
@@ -299,14 +309,14 @@ export default {
           message: '撤销成功！',
           type: 'success'
         })
-        for (let index = 0; index < this.page_datas.length; index++) {
-          if (this.page_datas[index].id === resData.id) {
-            this.page_datas[index].status = resData.status
-            this.page_datas[index].charge_value = resData.charge_value
-            break
-          }
-        }
-        // this.get_need_data(this.my_pagination)
+        // for (let index = 0; index < this.page_datas.length; index++) {
+        //   if (this.page_datas[index].id === resData.id) {
+        //     this.page_datas[index].status = resData.status
+        //     this.page_datas[index].charge_value = resData.charge_value
+        //     break
+        //   }
+        // }
+        this.get_need_data(this.my_pagination)
       })
     },
 

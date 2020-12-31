@@ -146,17 +146,17 @@ class ChargeViewset(ModelViewSet):
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             if bool(self.request.query_params.get('user')):
                 user_id = self.request.query_params.get('user')
-                queryset = Charge.objects.filter(user_id=user_id).order_by('-update_time')
+                queryset = Charge.objects.filter(user_id=user_id).order_by('-charge_time')
             else:
-                queryset = Charge.objects.all().order_by('-update_time')
+                queryset = Charge.objects.all().order_by('-charge_time')
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
                 '''
                 找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
                 '''
                 qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
-                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-update_time')
+                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-charge_time')
         elif bool(self.request.auth):
-            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-update_time')
+            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-charge_time')
         else:
             queryset = []
         # 如果不用filter_class自定义时间过滤，也可以通过下面的方法进行过滤
@@ -221,17 +221,17 @@ class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             if bool(self.request.query_params.get('user')):
                 user_id = self.request.query_params.get('user')
-                queryset = Charge.objects.filter(user_id=user_id).order_by('-update_time')
+                queryset = Charge.objects.filter(user_id=user_id).order_by('-charge_time')
             else:
-                queryset = Charge.objects.all().order_by('-update_time')
+                queryset = Charge.objects.all().order_by('-charge_time')
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
                 '''
                 找出该用户的auth_id，然后再从AuthGame中找出该auth_id对应的game_id
                 '''
                 qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
-                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-update_time')
+                queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-charge_time')
         elif bool(self.request.auth):
-            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-update_time')
+            queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-charge_time')
         else:
             queryset = Charge.objects.filter(id=0)
         return queryset
