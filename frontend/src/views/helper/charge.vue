@@ -135,11 +135,13 @@
       </el-table-column>
     </el-table>
     <br>
-    <pagination 
-      :total="my_pagination.count" 
-      :page.sync="my_pagination.page" 
-      :page_size.sync="my_pagination.page_size" 
-      @pagination="pag_change"/>
+    <div class="page-wrap">
+      <pagination 
+        :total="my_pagination.count" 
+        :page.sync="my_pagination.page" 
+        :page_size.sync="my_pagination.page_size" 
+        @pagination="pag_change"/>
+    </div>
 
     <el-dialog
       :visible.sync="centerDialog_patch"
@@ -394,5 +396,8 @@ export default {
 .content-wrap {
 	user-select: text;
 	word-break: break-all;
+}
+.page-wrap {
+  overflow: auto;
 }
 </style>
