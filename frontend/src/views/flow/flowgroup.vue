@@ -279,7 +279,6 @@ export default {
       this.get_need_data(this.my_pagination)
     },
     pag_change() {
-      console.log(this.my_pagination)
       this.get_need_data(this.my_pagination)
     },
     search_change() {
@@ -293,7 +292,6 @@ export default {
       this.get_need_data(this.my_pagination)
     },
     get_users(users) {
-      console.log('查看users：', users)
       var user_str = ''
       for(let i in users) {
         user_str += users[i].username + '/' + users[i].real_name + '；'

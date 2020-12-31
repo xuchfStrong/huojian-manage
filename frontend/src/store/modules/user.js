@@ -118,10 +118,7 @@ const user = {
           commit('SET_AVATAR', data.img_url)
           if (data.group.group_type !== 'SuperAdmin') {
             commit('SET_AUTHS', data.auth.auth_permissions)
-            console.log('查看auths：', state.auth_json)
-            console.log(router.options.routes)
             var my_router = handleRouters(router.options.routes, state.auth_json)
-            console.log(my_router)
             router.options.routes = my_router
             commit('SET_ROUTE', router)
           }
