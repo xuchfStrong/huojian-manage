@@ -39,6 +39,9 @@
           <el-input v-model="ruleForm.content" clearable :rows=4 type="textarea" placeholder="自定义的类型必须输入原因"/>
         </el-form-item>
       </el-form>
+      <div class="tips">
+        如果冲错了，直接撤销后再冲。撤销会恢复到充值前的状态。
+      </div>
 
       <div style="text-align:center;">
         <el-button type="primary" @click="queryUser()">查询</el-button>
@@ -79,7 +82,8 @@
       <el-input
         v-model="parseText"
         clearable
-        :rows=4
+        :rows=5
+        size="mini"
         type="textarea"
         placeholder="将辅助上复制的内容粘贴到这里进行自动解析辅助ID和服务器ID"/>
       <span slot="footer" class="dialog-footer">
@@ -301,16 +305,7 @@ export default {
       this.result = []
       this.showResult = false
       this.$refs['formName'].resetFields()
-      // this.ruleForm = Object.assign({}, defaultRuleForm)
-      // this.ruleForm.chargetype = this.chargetypeList[0].id
     },
-
-    // // form数据验证
-    // resetForm(formName) {
-    //   this.centerDialog_post = false
-    //   this.centerDialog_patch = false
-    //   this.$refs[formName].resetFields()
-    // },
 
     // 确定提交按钮
     true_post() {
@@ -375,5 +370,10 @@ export default {
     user-select: text;
 	  word-break: break-all;
   }
+}
+.tips {
+  margin:0px 0 10px 10px;
+  font-size: 12px;
+  color: #909399;
 }
 </style>  

@@ -2,9 +2,7 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" size="mini" class="search_form_wrapper_small" label-width="50px"  label-position="right">
-      <el-form-item label="" class="btn-form-item">
-        <el-button type="primary" size="mini" @click="to_search">搜索</el-button>
-      </el-form-item>
+      <el-button type="primary" size="mini" @click="to_search" class="btn-form-item">搜索</el-button>
 
       <el-form-item label="用户:" v-if="isGetUser">
         <el-select size="mini" v-model="my_pagination.user_id" placeholder="请选择用户" filterable clearable style="width: 100%;">

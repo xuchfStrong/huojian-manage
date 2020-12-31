@@ -2,10 +2,10 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" size="mini" class="search_form_wrapper_small" label-width="80px"  label-position="right">
-      <el-form-item label="" class="btn-form-item" style="margin-right:0px;">
-        <el-button type="primary" size="mini" @click="to_search">搜索</el-button>
-        <el-button v-if="isCanExport" type="primary" size="mini" @click="export_xls">导出</el-button>
-      </el-form-item>
+        <el-button-group class="btn-form-item">
+          <el-button type="primary" size="mini" @click="to_search">搜索</el-button>
+          <el-button v-if="isCanExport" type="primary" size="mini" @click="export_xls">导出</el-button>
+        </el-button-group>
       
       <el-form-item label="游戏:" >
         <el-select size="mini" v-model="my_pagination.game" placeholder="请选择游戏" filterable clearable style="width: 100%;">

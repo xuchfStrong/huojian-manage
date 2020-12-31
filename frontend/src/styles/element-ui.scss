@@ -117,12 +117,13 @@
   }
 
   .btn-form-item {
-    min-width: 100px;
+    // min-width: 100px;
+    // width: 130px;
     text-align: right;
     margin-right: 0;
     position: absolute;
     right: 0;
-    top: 0;
+    top: 7px;
     z-index: 4;
     .el-form-item__content{
       width: auto;
