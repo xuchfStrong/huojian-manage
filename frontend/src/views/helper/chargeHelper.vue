@@ -53,9 +53,11 @@
         <div class="text-wrap">
           <p v-for="(item, index) in result" :key="index">{{item}}</p>
         </div>
-        <div style="text-align:center;">
-          <el-button type="primary" @click="copyResult()">复制</el-button>
-          <el-button type="primary" @click="clearResult()">清空</el-button>
+        <div class="flex-button">
+          <el-button @click="clearResult()">清空</el-button>
+          <div class="right">
+            <el-button type="primary" @click="copyResult()">复制</el-button>  
+          </div>
         </div>
       </div>
     </div>
@@ -304,7 +306,7 @@ export default {
     clearResult() {
       this.result = []
       this.showResult = false
-      this.$refs['formName'].resetFields()
+      this.$refs['ruleForm'].resetFields()
     },
 
     // 确定提交按钮
@@ -375,5 +377,15 @@ export default {
   margin:0px 0 10px 10px;
   font-size: 12px;
   color: #909399;
+}
+.flex-button {
+  display: flex;
+  .left {
+    width: 80px;
+  }
+  .right {
+    flex: 1;
+    text-align: center;
+  }
 }
 </style>  
