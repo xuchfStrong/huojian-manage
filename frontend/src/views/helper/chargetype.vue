@@ -70,8 +70,10 @@
           </el-form-item>
           <el-form-item label="辅助类型" prop="vip">
             <el-select size="small" v-model="ruleForm.vip" placeholder="请选择辅助类型" filterable clearable style="width: 100%;">
-              <el-option label="普通版" :value="0"/>
+              <!-- <el-option label="普通版" :value="0"/>
               <el-option label="VIP版" :value="1"/>
+              <el-option label="保持原状" :value="10"/> -->
+              <el-option v-for="(item, index) in typeList" :key="index" :label="item.lable" :value="item.value"/>
             </el-select>
           </el-form-item>
           <el-form-item label="充值类型" prop="decide_type">
@@ -130,8 +132,7 @@
           </el-form-item>
           <el-form-item label="辅助类型" prop="vip">
             <el-select size="small" v-model="ruleForm_patch.vip" placeholder="请选择辅助类型" filterable clearable style="width: 100%;">
-              <el-option label="普通版" :value="0"/>
-              <el-option label="VIP版" :value="1"/>
+              <el-option v-for="(item, index) in typeList" :key="index" :label="item.lable" :value="item.value"/>
             </el-select>
           </el-form-item>
           <el-form-item label="充值类型" prop="decide_type">
@@ -172,7 +173,8 @@ export default {
     typeFilter(type) {
       const typeMap = {
         0: '普通版',
-        1: 'VIP版'
+        1: 'VIP版',
+        10: '保持原状'
       }
       return typeMap[type]
     },
@@ -200,6 +202,11 @@ export default {
         days: '',
         content: ''
       },
+      typeList: [
+        {lable: '普通版本', value: 0},
+        {lable: 'VIP版本', value: 1},
+        {lable: '保持原状', value: 10}
+      ],
       rules: {
         type_name_cn: [
           { required: true, message: '请输入类型名称', trigger: 'blur' }

@@ -32,15 +32,19 @@
           <el-input v-model.number="ruleForm.charge_value" clearable/>
         </el-form-item>
         <el-form-item v-if="customTypeChecked" label="是否VIP" prop="fuzhu_vip">
-          <el-radio v-model="ruleForm.fuzhu_vip" :label=0 border size="mini">普通版</el-radio>
-          <el-radio v-model="ruleForm.fuzhu_vip" :label=1 border size="mini">VIP版本</el-radio>
+          <el-radio v-model="ruleForm.fuzhu_vip" :label=0 border size="mini">普通</el-radio>
+          <el-radio v-model="ruleForm.fuzhu_vip" :label=1 border size="mini">VIP</el-radio>
+          <el-radio v-model="ruleForm.fuzhu_vip" :label=10 border size="mini">原状</el-radio>
+          <div class="tips2">
+            保持原状就是不改变辅助VIP类型。
+          </div>
         </el-form-item>
         <el-form-item v-if="customTypeChecked" label="备注" prop="content">
           <el-input v-model="ruleForm.content" clearable :rows=4 type="textarea" placeholder="自定义的类型必须输入原因"/>
         </el-form-item>
       </el-form>
       <div class="tips">
-        如果冲错了，直接撤销后再冲。撤销会恢复到充值前的状态。
+        如果冲错了，直接撤销后再冲，撤销会恢复到充值前的状态； 赠送类型不会改变用户的VIP类型。
       </div>
 
       <div style="text-align:center;">
@@ -375,6 +379,10 @@ export default {
 }
 .tips {
   margin:0px 0 10px 10px;
+  font-size: 12px;
+  color: #909399;
+}
+.tips2 {
   font-size: 12px;
   color: #909399;
 }

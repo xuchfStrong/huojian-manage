@@ -32,6 +32,7 @@ class ChargeType(SoftDeleteModel, BaseModel):
   vip_choice = (
     (0, '普通卡'),
     (1, 'VIP卡'),
+    (10, '保持原状'),
   )
   decide_type_choice = (
     (0, '系统设定'),
