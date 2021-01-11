@@ -68,6 +68,15 @@ class ChargeTypeViewset(ModelViewSet):
         return queryset
 
 
+class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
+    '''
+    用于查询条件包含在数组的方式
+    https://www.cnblogs.com/MarsMercury/p/11316244.html
+    https://django-filter.readthedocs.io/en/master/ref/filters.html#baseinfilter
+    '''
+    pass
+
+
 class ChargeFilter(django_filters.rest_framework.FilterSet):
     """自定义充值的过滤类,会先经过ChargeViewset中的get_queryset，然后才到这里"""
     '''
@@ -77,6 +86,7 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
     '''
     start_time = django_filters.DateTimeFilter(field_name="charge_time",lookup_expr="gte")
     # end_time = django_filters.DateTimeFilter(field_name="charge_time",lookup_expr="lte")
+    user_id = NumberInFilter(field_name="user", lookup_expr='in')
 
 
     '''
@@ -84,13 +94,13 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
     要不然这种情况http://127.0.0.1:8000/charge/?start_time=2020-12-22&end_time=2020-12-22就查询不到2020-12-22的数据
     '''
     end_time = django_filters.DateTimeFilter(field_name="charge_time", method='filter_end_time')
-    user_id = django_filters.CharFilter(field_name="user", method='filter_user')
+    # user_id = django_filters.CharFilter(field_name="user", method='filter_user')
     def filter_end_time(self, queryset, name, value):
         end_time = value + datetime.timedelta(days=1)
         return queryset.filter(Q(charge_time__lte = end_time))
 
     def filter_user(self, queryset, name, value):
-        # 自定义的多选user查询，但是不是很好，需要找更好的办法
+        # 自定义的多选user查询，但是不是很好，采用上面的NumberInFilter才是更好的方法
         arr_user_id_str = value.split(',')
         arr_user_id_int = []
         for i in arr_user_id_str:
