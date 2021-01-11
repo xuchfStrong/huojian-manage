@@ -5,7 +5,7 @@
       <el-button type="primary" size="mini" @click="to_search" class="btn-form-item">搜索</el-button>
 
       <el-form-item label="用户:" v-if="isGetUser">
-        <el-select size="mini" v-model="my_pagination.user_id" placeholder="请选择用户" filterable clearable style="width: 100%;">
+        <el-select size="mini" v-model="my_pagination.user_id" multiple placeholder="请选择用户" filterable clearable style="width: 100%;">
           <el-option
             v-for="item in userList"
             :key="item.id"
@@ -16,7 +16,7 @@
       </el-form-item>
 
       <el-form-item label="游戏:" >
-        <el-select size="mini" v-model="my_pagination.game_id" placeholder="请选择游戏" filterable clearable style="width: 100%;">
+        <el-select size="mini" v-model="my_pagination.game_id" multiple placeholder="请选择游戏" filterable clearable style="width: 100%;">
           <el-option
             v-for="item in gameList"
             :key="item.game"
@@ -86,13 +86,19 @@ export default {
   },
 
   created: function() {
-    this.get_need_data(this.my_pagination)
+    this.get_need_data()
     this.get_authGame_data()
     this.get_user_data()
   },
 
   methods: {
-    get_need_data(params) {
+    get_need_data() {
+      const params = {
+        user_id: this.my_pagination.user_id? this.my_pagination.user_id.join() : undefined,
+        game_id: this.my_pagination.user_id? this.my_pagination.game_id.join() : undefined,
+        start_time: this.my_pagination.start_time,
+        end_time: this.my_pagination.end_time
+      }
       GetAjax('/chargeSum/', params).then(response => {
         const data = response.data
         this.page_datas = data

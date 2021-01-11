@@ -84,13 +84,23 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
     要不然这种情况http://127.0.0.1:8000/charge/?start_time=2020-12-22&end_time=2020-12-22就查询不到2020-12-22的数据
     '''
     end_time = django_filters.DateTimeFilter(field_name="charge_time", method='filter_end_time')
+    user_id = django_filters.CharFilter(field_name="user", method='filter_user')
     def filter_end_time(self, queryset, name, value):
         end_time = value + datetime.timedelta(days=1)
         return queryset.filter(Q(charge_time__lte = end_time))
 
+    def filter_user(self, queryset, name, value):
+        # 自定义的多选user查询，但是不是很好，需要找更好的办法
+        arr_user_id_str = value.split(',')
+        arr_user_id_int = []
+        for i in arr_user_id_str:
+            arr_user_id_int.append(int(i))
+        return queryset.filter(Q(user_id__in = arr_user_id_int))
+
+
     class Meta:
         model = Charge  # 关联的表
-        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype', 'user']  # 过滤的字段
+        fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype', 'user', 'user_id']  # 过滤的字段
 
 
 class ChargeViewset(ModelViewSet):
@@ -268,7 +278,7 @@ class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
     }
 
 
-class ChargeSumView(generics.GenericAPIView):
+class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
     '''
     根据时间段汇总充值数据
     '''
@@ -276,9 +286,10 @@ class ChargeSumView(generics.GenericAPIView):
     authentication_classes = (JWTAuthentication,)
     permission_classes = [BaseAuthPermission, ]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
-    filter_class  = ChargeFilter
+    # filter_class  = ChargeFilter  # 这里因为没有用get_query_set，所有没起作用
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        # return self.list(request, *args, **kwargs)
         try:
             query_res = self.query()
             return Response({"message": "查询成功", "errorCode": 0, "data": query_res})
@@ -306,9 +317,17 @@ class ChargeSumView(generics.GenericAPIView):
         select = {'day': connection.ops.date_trunc_sql('day', 'charge_time')} # 按天统计归档
         queryset = Charge.objects.filter(charge_time__range=[start_time, end_time]).extra(select=select)
         if game_id:
-            queryset = queryset.filter(game_id=game_id)
+            arr_game_id_str = game_id.split(',')
+            arr_game_id_int = []
+            for i in arr_game_id_str:
+                arr_game_id_int.append(int(i))
+            queryset = queryset.filter(game_id__in=arr_game_id_int)
         if user_id:
-            queryset = queryset.filter(user_id=user_id)
+            arr_user_id_str = user_id.split(',')
+            arr_user_id_int = []
+            for i in arr_user_id_str:
+                arr_user_id_int.append(int(i))
+            queryset = queryset.filter(user_id__in=arr_user_id_int)
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             # 这里的双下划线超厉害。比如下面的user__username就直接可以把对应的user_id在user表中对应的username查询出来。
             queryset = queryset.values("game__game_name_cn","user__username", "day").annotate(charge_value=Sum('charge_value'))
