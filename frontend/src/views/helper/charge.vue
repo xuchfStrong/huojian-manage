@@ -82,21 +82,23 @@
       stripe
       style="width: 100%">
       <el-table-column prop="id" label="ID" width="50"/>
-      <el-table-column  label="用户">
+      <el-table-column prop="user" label="用户"/>
+      <!-- <el-table-column  label="用户">
         <template slot-scope="scope">
           {{ scope.row.user.username }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column  label="充值类型">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" @click="rowClick(scope.row)"> {{ scope.row.chargetype.type_name_cn }}</el-button>
+          <el-button type="text" size="mini" @click="rowClick(scope.row)"> {{ scope.row.chargetype }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column  label="游戏">
+      <!-- <el-table-column  label="游戏">
         <template slot-scope="scope">
           {{ scope.row.game.game_name_cn }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
+      <el-table-column prop="game" label="游戏"/>
       <el-table-column prop="server_id" label="服务器ID"/>
       <el-table-column prop="userid" show-overflow-tooltip label="续费ID"/>
       <el-table-column prop="charge_value" label="金额" width="50"/>

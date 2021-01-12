@@ -193,10 +193,18 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
 
 # 返回充值信息
 class ReturnChargeSerializer(serializers.ModelSerializer):
-    game = GameSerializer()
-    user = ReturnBriefUserSerializer()
-    chargetype = ChargeTypeSerializer()
-    reset_user = ReturnBriefUserSerializer()
+    '''
+    下面两种返回的方式，第一种会直接返回单个字段，第二种会返回整个对象
+    '''
+    game = serializers.ReadOnlyField(source='game.game_name_cn')
+    user = serializers.ReadOnlyField(source='user.username')
+    chargetype = serializers.ReadOnlyField(source='chargetype.type_name_cn')
+    reset_user = serializers.ReadOnlyField(source='user.username')
+    # 下面这种方式会返回game的对象
+    # game = GameSerializer()
+    # user = ReturnBriefUserSerializer()
+    # chargetype = ChargeTypeSerializer()
+    # reset_user = ReturnBriefUserSerializer()
 
     class Meta:
         model = Charge
