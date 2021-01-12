@@ -201,6 +201,7 @@ class UserDictExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
 
 class UserInfo(APIView):
     authentication_classes = (JWTAuthentication,)
+    permission_classes = [JWTAuthPermission, ]
 
     def get(self, request, *args, **kwargs):
         '''
@@ -210,7 +211,7 @@ class UserInfo(APIView):
             json_data = {"message": "ok", "errorCode": 0, "data": {}}
             if not request.auth:
                 return Response({"message": "请先登录", "errorCode": 2, "data": {}})
-            user = User.objects.filter(id=request.user.id).first()
+            user = User.objects.get(id=request.user.id)
             user.bf_logo_time = user.update_time
             user.save()
             json_data['data'] = ReturnUserSerializer(user).data

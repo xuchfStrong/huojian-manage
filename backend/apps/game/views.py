@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from utils.utils import jwt_decode_handler,jwt_encode_handler,jwt_payload_handler,jwt_payload_handler,jwt_response_payload_handler,google_otp,VisitThrottle,getDistance,NormalObj
 from utils.jwtAuth import JWTAuthentication
 from utils.pagination import Pagination
-from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission
+from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission, AdminGetPermission
 from .models import *
 from .serializers import *
 from .filters import *
@@ -224,7 +224,7 @@ from drf_renderer_xlsx.renderers import XLSXRenderer
 class ChargeExportViewset(XLSXFileMixin, ReadOnlyModelViewSet):
     queryset = Charge.objects.all()
     authentication_classes = (JWTAuthentication,)
-    permission_classes = [BaseAuthPermission, ]
+    permission_classes = [JWTAuthPermission, ]
     serializer_class = ExportChargeSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class  = ChargeFilter
@@ -294,7 +294,7 @@ class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
     '''
     serializer_class = ChargeSumViewSerializer
     authentication_classes = (JWTAuthentication,)
-    permission_classes = [BaseAuthPermission, ]
+    permission_classes = [JWTAuthPermission, ]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     # filter_class  = ChargeFilter  # 这里因为没有用get_query_set，所有没起作用
 
@@ -354,7 +354,7 @@ class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
 class QueryGameUserView(generics.GenericAPIView):
     serializer_class = QueryGameUserViewSerializer
     authentication_classes = (JWTAuthentication,)
-    permission_classes = [BaseAuthPermission, ]
+    permission_classes = [JWTAuthPermission, ]
 
     # 这里定义的为get，就只能用get方法;如果想要支持post方法，就得定义对应的函数post
     def get(self, request):
@@ -396,7 +396,7 @@ class QueryGameUserView(generics.GenericAPIView):
 
 class UserOfAuthView(generics.GenericAPIView):
     authentication_classes = (JWTAuthentication,)
-    permission_classes = [BaseAuthPermission, ]
+    permission_classes = [AdminGetPermission, ]
 
     def get(self, request):
         try:

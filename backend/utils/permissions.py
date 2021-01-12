@@ -23,19 +23,27 @@ class JWTAuthPermission(BasePermission):
         return True
 
 
-class AllowAllPermission(object):
+class AllowAllPermission(BasePermission):
 
     def has_permission(self, request, view):
         return True
+
+
+class AdminGetPermission(BasePermission):
+    """
+    如果属于Admin用户组，允许GET
+    """
+
+    def has_permission(self, request, view):
+        if request.user.group.group_type in ['Admin'] and request.method in ['GET']:
+            return True
 
 
 class BaseAuthPermission(object):
     
     def need_auth_list_check(self, auth_name, request):
         # 只需登录白名单
-        if auth_name in ['userinfo', 'export*', 'querGameUser', 'chargeSum']:
-            return True
-        elif auth_name in ['userofauth'] and request.user.group.group_type in ['Admin']:
+        if auth_name in ['userinfo', 'export*']:
             return True
         else:
             return False
@@ -57,20 +65,16 @@ class BaseAuthPermission(object):
         admin_auth = AuthPermission.objects.filter(object_name=auth_name, auth_id=request.user.auth_id).first()
         if request.user.group.group_type in ['SuperAdmin', 'Admin', 'NormalUser'] and admin_auth:
             if view.action in ['list', 'retrieve']:
-                # 查看权限
-                if request.user.group.group_type in ['Admin'] and auth_name == 'user':
-                    # 如果是Admin组，都可以获取user信息，不需要设置auth_list=True
-                    return True
-                return bool(admin_auth.auth_list == True)
+                return bool(admin_auth.auth_list is True)
             elif view.action == 'create':
                 # 创建权限
-                return bool(admin_auth.auth_create == True)
+                return bool(admin_auth.auth_create is True)
             elif view.action in ['update', 'partial_update']:
                 # 修改权限
-                return bool(admin_auth.auth_update == True)
+                return bool(admin_auth.auth_update is True)
             elif view.action == 'destroy':
                 # 删除权限
-                return bool(admin_auth.auth_destroy == True)
+                return bool(admin_auth.auth_destroy is True)
             else:
                 return False
         else:
