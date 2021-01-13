@@ -80,6 +80,9 @@ class FormatReturnJsonMiddleware(object):
                     elif response.status_code >= 400 and response.status_code <= 499:
                         if response.data.get('message'):  # 兼容APIView返回data的设置
                             pass
+                        elif response.data.get('non_field_errors'):
+                            data = {"message": response.data.get('non_field_errors')[0], "errorCode": 1}
+                            response.data = data
                         else:
                             data = {"message": str(response.data), "errorCode": 1,"data": response.data}
                             response.data = data

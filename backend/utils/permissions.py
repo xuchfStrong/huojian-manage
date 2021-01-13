@@ -35,6 +35,9 @@ class AdminGetPermission(BasePermission):
     """
 
     def has_permission(self, request, view):
+        if request.user.group.group_type == 'SuperAdmin':
+            return True
+
         if request.user.group.group_type in ['Admin'] and request.method in ['GET']:
             return True
 
