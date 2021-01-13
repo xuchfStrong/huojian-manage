@@ -39,6 +39,8 @@ class JWTAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed({"message": "没有该用户","errorCode":1,"data":{}})
         try:
             user = User.objects.filter(id=id).first()
+            if user.status == 0:
+                raise exceptions.AuthenticationFailed({"message": "账号被冻结", "errorCode": 1, "data": {}})
         except User.DoesNotExist:
             raise exceptions.AuthenticationFailed({"message": "没有该用户","errorCode":1,"data":{}})
         return user

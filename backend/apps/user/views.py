@@ -73,7 +73,7 @@ class LoginView(generics.GenericAPIView):
             user = User.objects.filter(Q(username=username) | Q(phone=username) | Q(email=username)).first()
             if not user:
                 return Response({"message": "用户不存在", "errorCode": 2, "data": {}})
-            if user.status == '0':
+            if user.status == 0:
                 return Response({"message": "账号被冻结，无法登录。", "errorCode": 2, "data": {}})
             if hashlib.md5(user.password.encode(encoding='UTF-8')).hexdigest() == password:
                 payload = jwt_payload_handler(user)
