@@ -199,7 +199,7 @@ class ReturnChargeSerializer(serializers.ModelSerializer):
     game = serializers.ReadOnlyField(source='game.game_name_cn')
     user = serializers.ReadOnlyField(source='user.username')
     chargetype = serializers.ReadOnlyField(source='chargetype.type_name_cn')
-    reset_user = serializers.ReadOnlyField(source='user.username')
+    reset_user = serializers.ReadOnlyField(source='reset_user.username')
     # 下面这种方式会返回game的对象
     # game = GameSerializer()
     # user = ReturnBriefUserSerializer()
