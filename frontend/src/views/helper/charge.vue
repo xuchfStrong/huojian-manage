@@ -173,7 +173,7 @@
         </div>
         <div v-if="currentRow.status == 1 && currentRow.reset_user">
           <span>撤销用户:</span>
-          <span>{{ currentRow.reset_user.username }}</span>
+          <span>{{ currentRow.reset_user }}</span>
         </div>
       </div>
     </el-dialog>
