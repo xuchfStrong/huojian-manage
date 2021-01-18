@@ -56,6 +56,7 @@ class Charge(SoftDeleteModel, BaseModel):
     (0, '成功'),
     (1, '已撤销'),
     (2, '失败'),
+    (3, '异常'),
   )
   user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='用户', related_name='charge_user')
   game = models.ForeignKey(Game, on_delete=models.PROTECT, verbose_name='游戏', related_name='charge_game')
