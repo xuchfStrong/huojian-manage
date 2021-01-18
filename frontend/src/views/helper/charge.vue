@@ -22,6 +22,7 @@
           <el-option label="成功" :value="0"/>
           <el-option label="撤销" :value="1"/>
           <el-option label="失败" :value="2"/>
+          <el-option label="异常" :value="3"/>
         </el-select>
       </el-form-item>
       <el-form-item label="续费ID:">
@@ -96,8 +97,16 @@
       <el-table-column prop="status" label="状态" width="60">
         <template slot-scope="scope">
           <el-tag 
-            v-if="scope.row.status"
-            :type="scope.row.status === 2 ? 'danger' : 'info'"
+            v-if="scope.row.status == 1"
+            type='info'
+            disable-transitions>{{ scope.row.status | statusFilter }}</el-tag>
+          <el-tag 
+            v-else-if="scope.row.status == 2"
+            type='danger'
+            disable-transitions>{{ scope.row.status | statusFilter }}</el-tag>
+          <el-tag 
+            v-else-if="scope.row.status == 3"
+            type='warning'
             disable-transitions>{{ scope.row.status | statusFilter }}</el-tag>
           <el-tag
             v-else
@@ -193,7 +202,8 @@ export default {
       const statusMap = {
         0: '成功',
         1: '撤销',
-        2: '失败'
+        2: '失败',
+        3: '异常'
       }
       return statusMap[status]
     }
@@ -330,11 +340,11 @@ export default {
 
     // 点击行
     rowClick(row) {
+      this.currentRow = JSON.parse(JSON.stringify(row))
       if (row.result) {
-        this.currentRow = JSON.parse(JSON.stringify(row))
         this.currentResult = JSON.parse(this.currentRow.result.replace(/'/g, '"'))
       } else {
-        this.currentResult = ["无内容"]
+        this.currentResult = ["充值异常"]
       }
       this.centerDialog_view = true
     },

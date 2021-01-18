@@ -196,8 +196,10 @@ class ChargeViewset(ModelViewSet):
         self.perform_create(serializer)
         if (serializer.data['status'] == 0):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
+        elif (serializer.data['status'] == 2):
             return Response({"errorCode": 1, "message": serializer.data['result']}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"errorCode": 1, "message": '充值响应异常，请在充值页面查询是否已经充值成功'}, status=status.HTTP_403_FORBIDDEN)
 
 
     def update(self, request, *args, **kwargs):

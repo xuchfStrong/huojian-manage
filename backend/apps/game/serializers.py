@@ -98,7 +98,11 @@ class AddChargeSerializer(serializers.ModelSerializer):
         # validated_data['result'] = result
         charge_res = self.charge(validated_data)
         res_data = charge_res['data']
-        if charge_res['code'] == 200:
+        if charge_res['code'] == 100:
+            validated_data['status'] = 3
+            validated_data['charge_value'] = 0
+            validated_data['days'] = 0
+        elif charge_res['code'] == 200:
             validated_data['old_fuzhu_vip'] = res_data['old_fuzhu_vip']
             validated_data['fuzhu_vip'] = res_data['fuzhu_vip']
             validated_data['old_end_time'] = res_data['old_end_time']
@@ -129,12 +133,17 @@ class AddChargeSerializer(serializers.ModelSerializer):
             'account': account
         }
         try:
-            res = requests.post(url, data=params, timeout=5)
+            res = requests.post(url, data=params, timeout=10)
             res.raise_for_status()
             return  res.json()
-        except requests.HTTPError as e:
-            print(e)
+        # except requests.HTTPError as e:
+        #     print(e)
         except Exception as e:
+            res = {
+                'code': 100,
+                'data': {}
+            }
+            return res
             print(e)
 
 
