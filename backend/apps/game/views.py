@@ -1,6 +1,6 @@
 import datetime
 import requests
-from django.db.models import F, Q
+from django.db.models import F, Q, query
 from django.db.models import Count, Sum
 from django.db import connection
 import django_filters
@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from utils.utils import jwt_decode_handler,jwt_encode_handler,jwt_payload_handler,jwt_payload_handler,jwt_response_payload_handler,google_otp,VisitThrottle,getDistance,NormalObj
 from utils.jwtAuth import JWTAuthentication
 from utils.pagination import Pagination
-from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission, AdminGetPermission
+from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission, AdminGetPermission, AdminPermission
 from .models import *
 from .serializers import *
 from .filters import *
@@ -51,6 +51,15 @@ class AuthGameViewset(ModelViewSet):
             return queryset
         else:
             return AuthGame.objects.filter(auth_id=self.request.user.auth_id)
+
+
+class PriceViewset(ModelViewSet):
+    queryset = Price.objects.all()
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = [BaseAuthPermission, ]
+    serializer_class = PriceSerializer
+    pagination_class = Pagination
+    filter_fields = ('game_id', 'charge_type_id',)
 
 
 class ChargeTypeViewset(ModelViewSet):
@@ -113,6 +122,32 @@ class ChargeFilter(django_filters.rest_framework.FilterSet):
         fields = ['start_time', 'end_time', 'status', 'game', 'server_id', 'userid', 'chargetype', 'user', 'user_id']  # 过滤的字段
 
 
+class ModifyChargeViewset(ModelViewSet):
+    queryset = Charge.objects.all()
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = [AdminPermission, ]
+    serializer_class = ChargeSerializer
+
+    def update(self, request, *args, **kwargs):
+        if self.request.user.group.group_type not in ['SuperAdmin', 'Admin']:
+            return Response({"errorCode": 1, "message": '无权操作'})
+
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        if instance.status != 3:
+            return Response({"errorCode": 1, "message": '只有异常的记录才能修改'})
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
 class ChargeViewset(ModelViewSet):
     '''
     修改局部数据
@@ -148,7 +183,6 @@ class ChargeViewset(ModelViewSet):
 
 
     def get_serializer_class(self):
-        print('ChargeViewset')
         if self.action in ['create']:
             print('ChargeViewset-add')
             return AddChargeSerializer
@@ -189,6 +223,16 @@ class ChargeViewset(ModelViewSet):
     '''
     # 下面这个方法写与不写结果都一样， CreateModelMixin 中的create方法和这个差不多
     def create(self, request, *args, **kwargs):
+        game_id = request.data['game']
+        charge_type_id = request.data['chargetype']
+        price = Price.objects.filter(game_id = game_id, charge_type_id = charge_type_id).first()
+        # try:
+        #     price = Price.objects.filter(game_id = game_id, charge_type_id = charge_type_id).first()
+        # except Exception as e:
+        #     return Response({"message": "出现了无法预料的view视图错误：%s" % e, "errorCode": 1, "data": {}})
+        if price and price.status == 0:
+            return Response({"errorCode": 1, "message": '该游戏不允许充值该类型'}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # serializer.validated_data 和 AddChargeSerializer 中的validate返回的结果一样

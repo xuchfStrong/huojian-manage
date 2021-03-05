@@ -1,6 +1,7 @@
 from base.views import UploadFile, Tests, BeginCelery
 from user.views import LoginView, UserViewset, UserInfo, AuthViewset, UserDictExportViewset
-from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView, ChargeExportViewset,UserOfAuthView
+from game.views import GameViewset, AuthGameViewset, ChargeTypeViewset, ChargeViewset, QueryGameUserView, ChargeSumView, ChargeExportViewset,UserOfAuthView, PriceViewset
+from game.views import ModifyChargeViewset
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -42,7 +43,9 @@ router.register(r'game', GameViewset, base_name='游戏管理')
 router.register(r'authGame', AuthGameViewset, base_name='游戏权限管理')
 router.register(r'chargetype', ChargeTypeViewset, base_name='充值类型管理')
 router.register(r'charge', ChargeViewset, base_name='充值管理')
+router.register(r'modifyCharge', ModifyChargeViewset, base_name='修改游戏充值记录价格')
 router.register(r'exportCharge', ChargeExportViewset, base_name='充值导出')
+router.register(r'price', PriceViewset, base_name='游戏价格')
 
 
 urlpatterns = [

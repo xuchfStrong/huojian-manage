@@ -82,7 +82,7 @@
       border
       stripe
       style="width: 100%">
-      <el-table-column v-if="isShowId" prop="id" label="ID" width="50"/>
+      <el-table-column v-if="isAdmin" prop="id" label="ID" width="50"/>
       <el-table-column prop="user" label="用户"/>
       <el-table-column  label="充值类型">
         <template slot-scope="scope">
@@ -131,7 +131,8 @@
 				
       <el-table-column fixed="right" label="操作" align="center">
         <template slot-scope="scope" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.charge.auth_update">
-          <el-button size="mini" @click="patch_data_fuc(scope.row)">撤销</el-button>
+          <el-button v-if="isAdmin && scope.row.status == 3" size="mini" @click="patch_edit_fun(scope.row)">修改</el-button>
+          <el-button v-else size="mini" @click="patch_data_fuc(scope.row)">撤销</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -154,6 +155,23 @@
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="centerDialog_patch = false">取 消</el-button>
         <el-button size="mini" type="primary" @click="true_patch">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="centerDialog_edit"
+      v-dialogDrag
+      title="修改价格"
+      width="350px"
+      center>
+      <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px">
+        <el-form-item label="充值金额" prop="charge_value">
+          <el-input size="small" v-model="ruleForm.charge_value"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="centerDialog_edit = false">取 消</el-button>
+        <el-button size="mini" type="primary" @click="true_edit">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -213,6 +231,7 @@ export default {
       centerDialog: false,
       centerDialog_delete: false,
       centerDialog_patch: false,
+      centerDialog_edit: false,
       centerDialog_view: false,
       page_datas: [],
       currentRow: {},
@@ -233,7 +252,12 @@ export default {
         search_type: '',
         start_time: '',
         end_time: ''
-      }
+      },
+      rules: {
+        charge_vaule: [
+          { required: true, message: '请输入充值金额', trigger: 'blur' }
+        ]
+      },
     }
   },
 
@@ -244,7 +268,7 @@ export default {
     isCanExport() {
       return ['SuperAdmin'].includes(this.$store.getters.user_obj.group.group_type)
     },
-    isShowId() {
+    isAdmin() {
       return ['SuperAdmin', 'Admin'].includes(this.$store.getters.user_obj.group.group_type)
     }
   },
@@ -325,6 +349,49 @@ export default {
         // }
         this.get_need_data(this.my_pagination)
       })
+    },
+
+    patch_edit_data(data) {
+      this.centerDialog_edit = false
+      console.log('charge_value', data.charge_value)
+      const params = {
+        charge_value: data.charge_value
+      }
+      console.log('data', data)
+      console.log('params', params)
+      PatchAjax('/modifyCharge/' + data.id + '/', params).then(response => {
+        const resData = response.data
+        this.$message({
+          showClose: true,
+          message: '修改成功！',
+          type: 'success'
+        })
+        // for (let index = 0; index < this.page_datas.length; index++) {
+        //   if (this.page_datas[index].id === resData.id) {
+        //     this.page_datas[index].status = resData.status
+        //     this.page_datas[index].charge_value = resData.charge_value
+        //     break
+        //   }
+        // }
+        this.get_need_data(this.my_pagination)
+      })
+    },
+
+    // 修改价格
+    patch_edit_fun(row) {
+      console.log('row', row)
+      this.ruleForm = JSON.parse(JSON.stringify(row))
+      console.log('ruleForm', this.ruleForm)
+      this.centerDialog_edit = true
+    },
+
+    // 确认修改价格
+    true_edit() {
+      const params = {
+        charge_value: this.ruleForm.charge_vaule
+      }
+      // this.patch_edit_data(params, this.ruleForm.id)
+      this.patch_edit_data(this.ruleForm)
     },
 
     // 修改按钮

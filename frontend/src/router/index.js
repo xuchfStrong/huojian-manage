@@ -107,6 +107,12 @@ export const constantRouterMap = [
         meta: { title: '充值类型', icon: 'form' }
       },
       {
+        path: 'price',
+        name: 'price',
+        component: () => import('@/views/helper/price'),
+        meta: { title: '游戏价格', icon: 'form' }
+      },
+      {
         path: 'authGame',
         name: 'authGame',
         component: () => import('@/views/helper/authGame'),

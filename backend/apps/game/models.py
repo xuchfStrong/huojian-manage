@@ -51,6 +51,19 @@ class ChargeType(SoftDeleteModel, BaseModel):
       verbose_name_plural = verbose_name
 
 
+class Price(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, verbose_name='游戏', related_name='price_game')
+    charge_type = models.ForeignKey(ChargeType, on_delete=models.CASCADE, verbose_name='价格', related_name='price_charge_type')
+    charge_value = models.IntegerField(default=0, verbose_name='充值金额')
+    status = models.IntegerField(default=0, verbose_name='是否开启')
+
+    class Meta:
+        db_table = 'A_Price'
+        verbose_name = '充值价格表'
+        verbose_name_plural = verbose_name
+        unique_together=("game","charge_type")
+
+
 class Charge(SoftDeleteModel, BaseModel):
   status_choices = (
     (0, '成功'),

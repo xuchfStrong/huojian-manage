@@ -29,6 +29,15 @@ class AllowAllPermission(BasePermission):
         return True
 
 
+class AdminPermission(BasePermission):
+    """
+    如果是Admin就允许
+    """
+    def has_permission(self, request, view):
+        if request.user.group.group_type in ['Admin', 'SuperAdmin']:
+            return True
+
+
 class AdminGetPermission(BasePermission):
     """
     如果属于Admin用户组，允许GET

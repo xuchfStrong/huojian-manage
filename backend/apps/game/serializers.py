@@ -44,6 +44,21 @@ class AuthGameSerializer(serializers.ModelSerializer):
         return obj.auth.auth_type
 
 
+# 游戏价格序列化器
+class PriceSerializer(serializers.ModelSerializer):
+    game_name_cn = serializers.SerializerMethodField()
+    charge_type_name_cn = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Price
+        exclude = ()
+
+    def get_game_name_cn(self, obj):
+        return obj.game.game_name_cn
+
+    def get_charge_type_name_cn(self, obj):
+        return obj.charge_type.type_name_cn
+
 
 class GameListSerializer(serializers.ModelSerializer):
 
@@ -98,6 +113,16 @@ class AddChargeSerializer(serializers.ModelSerializer):
         # validated_data['result'] = result
         charge_res = self.charge(validated_data)
         res_data = charge_res['data']
+
+        # 判断是否改游戏和充值类型是否有单独定价
+        game_id = validated_data.get('game').id
+        charge_type_id = validated_data.get('chargetype').id
+        price = Price.objects.filter(game_id = game_id, charge_type_id = charge_type_id).first()
+        if price:
+            charge_value = price.charge_value
+        else:
+            charge_value = validated_data.get('charge_value')
+
         if charge_res['code'] == 100:
             validated_data['status'] = 3
             validated_data['charge_value'] = 0
@@ -108,7 +133,7 @@ class AddChargeSerializer(serializers.ModelSerializer):
             validated_data['old_end_time'] = res_data['old_end_time']
             validated_data['end_time'] = res_data['end_time']
             validated_data['result'] = res_data['result']
-            validated_data['charge_value'] = validated_data.get('charge_value')
+            validated_data['charge_value'] = charge_value
             validated_data['days'] = validated_data.get('days')
         else:
             validated_data['result'] = res_data['result']
@@ -215,6 +240,11 @@ class ReturnChargeSerializer(serializers.ModelSerializer):
     # chargetype = ChargeTypeSerializer()
     # reset_user = ReturnBriefUserSerializer()
 
+    class Meta:
+        model = Charge
+        exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)
+
+class ChargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Charge
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)

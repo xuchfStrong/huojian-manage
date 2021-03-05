@@ -231,6 +231,14 @@ export default {
             auth_destroy: false
           },
           {
+            object_name: 'price',
+            object_name_cn: '游戏价格',
+            auth_list: false,
+            auth_create: false,
+            auth_update: false,
+            auth_destroy: false
+          },
+          {
             object_name: 'chargetype',
             object_name_cn: '充值类型',
             auth_list: false,
