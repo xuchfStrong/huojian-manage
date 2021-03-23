@@ -8,7 +8,7 @@
       </div>
 
       <el-form-item label="充值类型:">
-        <el-select size="mini" v-model="my_pagination.charge_type_id" multiple placeholder="请选择充值类型" filterable clearable style="width: 100%;">
+        <el-select size="mini" v-model="my_pagination.charge_type_id" placeholder="请选择充值类型" filterable clearable style="width: 100%;">
           <el-option
             v-for="item in chargetypeList"
             :key="item.id"
@@ -19,7 +19,7 @@
       </el-form-item>
 
       <el-form-item label="游戏:" >
-        <el-select size="mini" v-model="my_pagination.game_id" multiple placeholder="请选择游戏" filterable clearable style="width: 100%;">
+        <el-select size="mini" v-model="my_pagination.game_id" placeholder="请选择游戏" filterable clearable style="width: 100%;">
           <el-option
             v-for="item in gameList"
             :key="item.game"
