@@ -82,7 +82,7 @@
       border
       stripe
       style="width: 100%">
-      <el-table-column v-if="isAdmin" prop="id" label="ID" width="50"/>
+      <el-table-column v-if="isAdmin" prop="id" label="ID" width="65"/>
       <el-table-column prop="user" label="用户"/>
       <el-table-column  label="充值类型">
         <template slot-scope="scope">
@@ -93,7 +93,7 @@
       <el-table-column prop="server_id" label="服务器ID"/>
       <el-table-column prop="userid" show-overflow-tooltip label="续费ID"/>
       <el-table-column prop="charge_value" label="金额" width="50"/>
-      <el-table-column prop="days" label="天数" width="50"/>
+      <el-table-column prop="days" label="天数" width="48"/>
       <el-table-column prop="status" label="状态" width="60">
         <template slot-scope="scope">
           <el-tag 
@@ -129,7 +129,7 @@
       <el-table-column prop="end_time" label="到期时间" width="135"/>
 			<el-table-column prop="content" label="备注"/>
 				
-      <el-table-column fixed="right" label="操作" align="center">
+      <el-table-column fixed="right" label="操作" align="center" width="70">
         <template slot-scope="scope" v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.charge.auth_update">
           <el-button v-if="isAdmin && scope.row.status == 3" size="mini" @click="patch_edit_fun(scope.row)">修改</el-button>
           <el-button v-else size="mini" @click="patch_data_fuc(scope.row)">撤销</el-button>
@@ -199,7 +199,6 @@
 </template>
 
 <script>
-import store from '@/store'
 import { exportXls } from '@/api/export'
 import { GetAjax, PostAjax, PatchAjax, DeleteAjax } from '@/api/myapi'
 import Mysearch from '@/components/SearchField/index2.vue'

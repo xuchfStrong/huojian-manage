@@ -101,7 +101,6 @@
 </template>
 
 <script>
-import store from '@/store'
 import { GetAjax, PostAjax, PatchAjax, DeleteAjax } from '@/api/myapi'
 import Pagination from '@/components/Pagination'
 
