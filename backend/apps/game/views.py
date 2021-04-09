@@ -17,7 +17,7 @@ from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPer
 from .models import *
 from .serializers import *
 from .filters import *
-from user.models import User
+from user.models import User,Auth
 
 
 class GameViewset(ModelViewSet):

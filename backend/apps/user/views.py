@@ -27,6 +27,7 @@ from utils.pagination import Pagination
 from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission
 from .models import *
 from .serializers import *
+from game.models import AuthGame
 from .filters import *
 from functools import reduce
 from urllib.parse import unquote_plus
@@ -249,7 +250,10 @@ class AuthViewset(ModelViewSet):
         instance = self.get_object()
         # 删除权限子表
         auths = AuthPermission.objects.filter(auth_id=instance.id)
+        auth_games = AuthGame.objects.filter(auth_id=instance.id)
         for item in auths:
+            item.delete()
+        for item in auth_games:
             item.delete()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)

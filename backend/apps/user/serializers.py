@@ -3,8 +3,10 @@ from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
 from rest_framework.validators import UniqueValidator
 from base.serializers import BaseModelSerializer
+from game.serializers import AuthGameSerializer,AddAuthGameSerializer
 from rest_framework.utils import model_meta
 from .models import *
+from game.models import AuthGame
 import time
 import datetime
 import threading
@@ -33,6 +35,7 @@ class AddAuthSerializer(serializers.ModelSerializer, BaseModelSerializer):
     # 反向取权限，通过related_name
     # 一对多，一个auth下有多个权限，一定要设定many=True
     auth_permissions = AddAuthPermissionSerializer(many=True)
+    auth_game = AddAuthGameSerializer(many=True)
 
     class Meta:
         model = Auth
@@ -40,25 +43,36 @@ class AddAuthSerializer(serializers.ModelSerializer, BaseModelSerializer):
 
     def create(self, validated_data):
         auth_permissions_data = validated_data.pop('auth_permissions')
+        auth_game_data = validated_data.pop('auth_game')
         auth_per = Auth.objects.create(**validated_data)
         # 创建权限菜单的方法
         for item in auth_permissions_data:
             # 这里的auth就是AuthPermission表的外键，所以这里用的就前面创建的auth_per对象
             AuthPermission.objects.create(auth=auth_per, **item)
+        for item in auth_game_data:
+            AuthGame.objects.create(auth=auth_per, **item)
         return auth_per
 
     def update(self, instance, validated_data):
         # print('查看auth_permissions：', validated_data.get('auth_permissions'))
         if validated_data.get('auth_permissions'):
             auth_permissions_data = validated_data.pop('auth_permissions')
+            auth_game_data = validated_data.pop('auth_game')
             # 修改时创建权限菜单的方法
             need_dels = AuthPermission.objects.filter(auth_id=instance.id)
+            need_dels_auth_game = AuthGame.objects.filter(auth_id=instance.id)
             for item in need_dels:
+                item.delete()
+            for item in need_dels_auth_game:
                 item.delete()
             for item in auth_permissions_data:
                 # print('查看：', item)
                 # print('查看id：', item.get('id'))
                 AuthPermission.objects.create(auth=instance, **item)
+            for item in auth_game_data:
+                # print('查看：', item)
+                # print('查看id：', item.get('id'))
+                AuthGame.objects.create(auth=instance, **item)
             # 开多线程优化代码
             # del_work = threading.Thread(target=del_worker,args=(need_dels,))
             # del_work.start()
@@ -81,6 +95,7 @@ class AddAuthSerializer(serializers.ModelSerializer, BaseModelSerializer):
 # 返回权限使用
 class ReturnAuthSerializer(serializers.ModelSerializer, BaseModelSerializer):
     auth_permissions = AddAuthPermissionSerializer(read_only=True, many=True)
+    auth_game = AuthGameSerializer(read_only=True, many=True)
 
     class Meta:
         model = Auth

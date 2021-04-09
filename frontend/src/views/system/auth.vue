@@ -32,6 +32,11 @@
           <span>{{ get_auth(scope.row.auth_permissions) }}</span>
         </template>
       </el-table-column>
+      <el-table-column prop="slot" label="游戏">
+        <template slot-scope="scope">
+          <div v-for="item in scope.row.auth_game" :key="item.id">{{ item.game_name_cn }}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="100" align="center">
         <template slot-scope="scope">
           <el-row v-if="$store.getters.user_obj.group.group_type === 'SuperAdmin' || $store.getters.auth_json.auth.auth_update">
@@ -97,6 +102,13 @@
               </el-col>
             </el-row>
           </el-form-item>
+          <h3>游戏配置：</h3>
+          <el-form-item label="">
+            <el-checkbox-group 
+              v-model="checkedGames">
+              <el-checkbox v-for="game in gameData" :label="game.id" :key="game.id">{{game.game_name_cn}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -161,6 +173,13 @@
               </el-col>
             </el-row>
           </el-form-item>
+          <h3>游戏配置：</h3>
+          <el-form-item label="">
+            <el-checkbox-group 
+              v-model="checkedGames">
+              <el-checkbox v-for="game in gameData" :label="game.id" :key="game.id">{{game.game_name_cn}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -195,6 +214,8 @@ export default {
       centerDialog_delete: false,
       centerDialog_patch: false,
       page_datas: [],
+      gameData: [],
+      checkedGames: [],
       ruleForm: {
         auth_type: '',
         auth_permissions: [
@@ -272,6 +293,7 @@ export default {
   },
   created: function() {
     this.get_need_data(this.my_pagination)
+    this.get_game_data()
   },
   methods: {
     get_need_data(params) {
@@ -279,6 +301,12 @@ export default {
         const data = response.data
         this.page_datas = data
         this.my_pagination.count = response.count
+      })
+    },
+    get_game_data(params) {
+      GetAjax('/game/', params).then(response => {
+        const data = response.data
+        this.gameData = data
       })
     },
     post_need_data(data) {
@@ -320,13 +348,19 @@ export default {
       })
     },
     submitForm(formName) {
+      const auth_game = []
+      this.checkedGames.forEach(gameId => {
+        auth_game.push({game: gameId})
+      })
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (formName == 'ruleForm') {
             // datetime.format(this.ruleForm.date, 'YYYY-MM-DD')
             // console.log(datetime.format(this.ruleForm.time, 'hh:mm:ss'))
+            this.ruleForm.auth_game = auth_game
             this.post_need_data(this.ruleForm)
           } else {
+            this.ruleForm_patch.auth_game = auth_game
             this.patch_need_data(this.ruleForm_patch)
           }
         } else {
@@ -348,6 +382,7 @@ export default {
     },
     // 新增按钮
     new_data() {
+      this.checkedGames = []
       this.centerDialog = true
     },
     // 确定删除按钮
@@ -357,6 +392,7 @@ export default {
     // 编辑按钮
     edit_data(row) {
       this.ruleForm_patch = JSON.parse(JSON.stringify(row))
+      this.checkedGames = []
       for (var i in this.ruleForm.auth_permissions) {
         var is_have = false
         for (var j in this.ruleForm_patch.auth_permissions) {
@@ -369,6 +405,9 @@ export default {
           this.ruleForm_patch.auth_permissions.push(this.ruleForm.auth_permissions[i])
         }
       }
+      this.ruleForm_patch.auth_game.forEach(item => {
+        this.checkedGames.push(item.game)
+      })
       this.centerDialog_patch = true
     },
     // 搜索层相关

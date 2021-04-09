@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from base.serializers import BaseModelSerializer
-from user.serializers import ReturnBriefUserSerializer
 from rest_framework.utils import model_meta
 from .models import *
 from user.models import Auth
@@ -20,6 +19,11 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)
 
+# 添加游戏群贤的序列化器
+class AddAuthGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuthGame
+        exclude = ('auth',)
 
 # 游戏权限序列化器
 class AuthGameSerializer(serializers.ModelSerializer):
