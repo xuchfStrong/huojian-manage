@@ -263,7 +263,7 @@ export default {
 
   computed: {
     isGetUser() {
-      return ['SuperAdmin', 'Admin'].includes(this.$store.getters.user_obj.group.group_type) || this.$store.getters.auth_json.user.auth_list
+      return ['SuperAdmin', 'Admin', 'NormalUser'].includes(this.$store.getters.user_obj.group.group_type) || this.$store.getters.auth_json.user.auth_list
     },
     isCanExport() {
       return ['SuperAdmin'].includes(this.$store.getters.user_obj.group.group_type)

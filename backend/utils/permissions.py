@@ -37,6 +37,13 @@ class AdminPermission(BasePermission):
         if request.user.group.group_type in ['Admin', 'SuperAdmin']:
             return True
 
+class NotSecondaryDealerPermission(BasePermission):
+    """
+    如果是不是SecondaryDealer就允许Get
+    """
+    def has_permission(self, request, view):
+        if request.user.group.group_type in ['Admin', 'SuperAdmin', 'NormalUser'] and request.method in ['GET']:
+            return True
 
 class AdminGetPermission(BasePermission):
     """
@@ -75,7 +82,7 @@ class BaseAuthPermission(object):
         if self.need_auth_list_check(auth_name, request):
             return True
         admin_auth = AuthPermission.objects.filter(object_name=auth_name, auth_id=request.user.auth_id).first()
-        if request.user.group.group_type in ['SuperAdmin', 'Admin', 'NormalUser'] and admin_auth:
+        if admin_auth:
             if view.action in ['list', 'retrieve']:
                 return bool(admin_auth.auth_list is True)
             elif view.action == 'create':

@@ -6,7 +6,8 @@ class Group(SoftDeleteModel, BaseModel):
     group_type_choices = (
         ('SuperAdmin', '超级管理员'),
         ('Admin', '管理员'),
-        ('NormalUser', '普通用户'),
+        ('NormalUser', '一级代理'),
+        ('SecondaryDealer', '二级代理'),
     )
     group_type = models.CharField(max_length=255, choices=group_type_choices, verbose_name='用户组类型')
     group_type_cn = models.CharField(max_length=255, verbose_name='用户组类型-cn')
@@ -55,6 +56,7 @@ class User(SoftDeleteModel, BaseModel):
     group = models.ForeignKey(Group, on_delete=models.PROTECT, verbose_name='用户组')
     auth = models.ForeignKey(Auth, on_delete=models.PROTECT, null=True, blank=True, verbose_name='权限组')
     bf_logo_time = models.DateTimeField(null=True, blank=True, verbose_name='上次登录时间')
+    parent_id = models.IntegerField( null=True, blank=True,  verbose_name='所属一级代理ID')
 
     class Meta:
         db_table = 'A_User_Table'

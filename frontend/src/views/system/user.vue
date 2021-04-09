@@ -30,7 +30,7 @@
 			<el-table-column prop="phone" label="手机号"/>
 			<el-table-column prop="email" label="邮箱"/>
 			<el-table-column prop="real_name" label="姓名"/>
-			<el-table-column prop="group.group_type" label="角色"/>
+			<el-table-column prop="group.group_type_cn" label="角色"/>
       <el-table-column prop="auth.auth_type" label="权限"/>
 			<el-table-column prop="bf_logo_time" label="上次登录时间"/>
       <el-table-column label="操作" width="150" align="center">
@@ -59,8 +59,12 @@
           </el-form-item>
           <el-form-item label="角色" prop="group">
             <el-select size="small" v-model="ruleForm.group" placeholder="请选择角色" filterable clearable style="width: 100%;">
-              <el-option label="管理员" :value="2"/>
-              <el-option label="普通用户" :value="3"/>
+              <el-option v-for="item in groupTypeList" :key="item.id" :label="item.label" :value="item.id"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="上级" v-if="ruleForm.group == 4" prop="parent_id">
+            <el-select size="small" v-model="ruleForm.parent_id" placeholder="请选择上级" filterable clearable style="width: 100%;">
+              <el-option v-for="item in userList" :key="item.id" :label="item.username" :value="item.id"/>
             </el-select>
           </el-form-item>
           <el-form-item label="权限" prop="auth">
@@ -124,8 +128,12 @@
           </el-form-item>
           <el-form-item label="角色" prop="group">
             <el-select size="small" v-model="ruleForm_patch.group" placeholder="请选择角色" filterable clearable style="width: 100%;">
-              <el-option label="管理员" :value="2"/>
-              <el-option label="普通用户" :value="3"/>
+              <el-option v-for="item in groupTypeList" :key="item.id" :label="item.label" :value="item.id"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="上级" v-if="ruleForm_patch.group == 4" prop="parent_id">
+            <el-select size="small" v-model="ruleForm_patch.parent_id" placeholder="请选择上级" filterable clearable style="width: 100%;">
+              <el-option v-for="item in userList" :key="item.id" :label="item.username" :value="item.id"/>
             </el-select>
           </el-form-item>
           <el-form-item label="权限" prop="auth">
@@ -187,6 +195,12 @@ export default {
       centerDialog_delete: false,
       centerDialog_patch: false,
       page_datas: [],
+      userList: [],
+      groupTypeList: [
+        {label: '管理员', id: 2},
+        {label: '一级代理', id: 3},
+        {label: '二级代理', id: 4}
+      ],
       ruleForm: {
         username: '',
         password: '',
@@ -196,6 +210,7 @@ export default {
         auth: '',
         status: false,
         group: '',
+        parent_id: null,
         real_name: ''
       },
       rules: {
@@ -216,6 +231,9 @@ export default {
         ],
         auth: [
           { required: true, message: '请选择权限', trigger: 'change' }
+        ],
+        parent_id: [
+          { required: true, message: '请选择上级', trigger: 'change' }
         ],
       },
       ruleForm_patch: {
@@ -244,6 +262,7 @@ export default {
   created: function() {
     this.get_need_data(this.my_pagination)
     this.get_auth_data()
+    this.getUserList()
   },
   methods: {
     get_need_data(params) {
@@ -260,7 +279,17 @@ export default {
         this.auth_datas = data
       })
     },
+    getUserList() {
+      GetAjax('/user/').then(response => {
+        const data = response.data
+        const GroupType = ['NormalUser']
+        this.userList = data.filter(item => {
+          return GroupType.includes(item.group.group_type)
+        })
+      })
+    },
     post_need_data(data) {
+      if (!data.parent_id) data.parent_id = null
       PostAjax('/user/', data).then(response => {
         const data = response.data
         this.centerDialog = false
@@ -274,6 +303,7 @@ export default {
       })
     },
     patch_need_data(data) {
+      if (!data.parent_id) data.parent_id = null
       PatchAjax('/user/' + data.id + '/', data).then(response => {
         const data = response.data
         this.centerDialog_patch = false

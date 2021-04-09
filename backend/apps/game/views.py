@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from utils.utils import jwt_decode_handler,jwt_encode_handler,jwt_payload_handler,jwt_payload_handler,jwt_response_payload_handler,google_otp,VisitThrottle,getDistance,NormalObj
 from utils.jwtAuth import JWTAuthentication
 from utils.pagination import Pagination
-from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission, AdminGetPermission, AdminPermission
+from utils.permissions import JWTAuthPermission, AllowAllPermission, BaseAuthPermission, NotSecondaryDealerPermission, AdminPermission
 from .models import *
 from .serializers import *
 from .filters import *
@@ -209,6 +209,9 @@ class ChargeViewset(ModelViewSet):
                 '''
                 qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
                 queryset = Charge.objects.filter(game_id__in = qs_game).order_by('-charge_time')
+        elif bool(self.request.auth) and self.request.user.group.group_type == 'NormalUser':
+            SecondaryDealerUser = User.objects.filter(parent_id = self.request.user.id).values('id')
+            queryset = Charge.objects.filter(Q(user_id__in = SecondaryDealerUser) | Q(user_id=self.request.user.id)).order_by('-charge_time')
         elif bool(self.request.auth):
             queryset = Charge.objects.filter(user_id=self.request.user.id).order_by('-charge_time')
         else:
@@ -390,6 +393,9 @@ class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
         elif bool(self.request.auth) and self.request.user.group.group_type == 'Admin':
             qs_game = AuthGame.objects.filter(auth_id=self.request.user.auth_id).values('game_id')
             queryset = queryset.filter(game_id__in = qs_game).values("game__game_name_cn","user__username", "day").annotate(charge_value=Sum('charge_value'))
+        elif bool(self.request.auth) and self.request.user.group.group_type == 'NormalUser':
+            SecondaryDealerUser = User.objects.filter(parent_id = self.request.user.id).values('id')
+            queryset = queryset.filter(Q(user_id__in = SecondaryDealerUser) | Q(user_id=self.request.user.id)).values("game__game_name_cn","user__username", "day").annotate(charge_value=Sum('charge_value'))
         elif bool(self.request.auth):
             queryset = queryset.filter(user_id=self.request.user.id).values("game__game_name_cn","user__username", "day").annotate(charge_value=Sum('charge_value'))
         else:
@@ -442,7 +448,7 @@ class QueryGameUserView(generics.GenericAPIView):
 
 class UserOfAuthView(generics.GenericAPIView):
     authentication_classes = (JWTAuthentication,)
-    permission_classes = [AdminGetPermission, ]
+    permission_classes = [NotSecondaryDealerPermission, ]
 
     def get(self, request):
         try:
@@ -450,6 +456,9 @@ class UserOfAuthView(generics.GenericAPIView):
             qs1 = AuthGame.objects.filter(auth_id = auth_id).values('game_id')
             qs2 = AuthGame.objects.filter(game_id__in = qs1).values('auth_id')
             qs3 = User.objects.filter(auth_id__in = qs2).values('username', 'id')
+            if request.user.group.group_type == 'NormalUser':
+                SecondaryDealerUser = User.objects.filter(parent_id=self.request.user.id).values('id')
+                qs3 = User.objects.filter(Q(id__in=SecondaryDealerUser) | Q(id=self.request.user.id)).values('username', 'id')
             return Response({"message": '操作成功', "errorCode": 0, "data": qs3})
         except Exception as e:
             return Response({"message": "出现了无法预料的view视图错误：%s" % e, "errorCode": 1, "data": {}})
