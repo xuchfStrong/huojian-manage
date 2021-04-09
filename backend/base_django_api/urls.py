@@ -40,7 +40,7 @@ router.register(r'flowbody', FlowBodyViewset, base_name='审批主体管理')
 router.register(r'needflowbody', FlowBodyNeedFlowViewset, base_name='待审批列表')
 # 游戏管理
 router.register(r'game', GameViewset, base_name='游戏管理')
-# router.register(r'authGame', AuthGameViewset, base_name='游戏权限管理')
+router.register(r'authGame', AuthGameViewset, base_name='游戏权限管理')
 router.register(r'chargetype', ChargeTypeViewset, base_name='充值类型管理')
 router.register(r'charge', ChargeViewset, base_name='充值管理')
 router.register(r'modifyCharge', ModifyChargeViewset, base_name='修改游戏充值记录价格')

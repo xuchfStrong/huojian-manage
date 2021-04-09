@@ -8,6 +8,7 @@ import json
 import requests
 import datetime
 
+
 # 游戏序列化器
 class GameSerializer(serializers.ModelSerializer):
     game_name = serializers.CharField(label="游戏名称代码", help_text="游戏名称代码", required=True, allow_blank=False,
@@ -19,11 +20,14 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)
 
+
 # 添加游戏群贤的序列化器
 class AddAuthGameSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthGame
+
         exclude = ('auth',)
+
 
 # 游戏权限序列化器
 class AuthGameSerializer(serializers.ModelSerializer):
@@ -38,13 +42,16 @@ class AuthGameSerializer(serializers.ModelSerializer):
         model = AuthGame
         exclude = ()
 
-    def get_game_name_cn(self, obj):
+    @staticmethod
+    def get_game_name_cn(obj):
         return obj.game.game_name_cn
 
-    def get_game_name(self, obj):
+    @staticmethod
+    def get_game_name(obj):
         return obj.game.game_name
 
-    def get_auth_type(self, obj):
+    @staticmethod
+    def get_auth_type(obj):
         return obj.auth.auth_type
 
 
@@ -57,10 +64,12 @@ class PriceSerializer(serializers.ModelSerializer):
         model = Price
         exclude = ()
 
-    def get_game_name_cn(self, obj):
+    @staticmethod
+    def get_game_name_cn(obj):
         return obj.game.game_name_cn
 
-    def get_charge_type_name_cn(self, obj):
+    @staticmethod
+    def get_charge_type_name_cn(obj):
         return obj.charge_type.type_name_cn
 
 
@@ -147,7 +156,8 @@ class AddChargeSerializer(serializers.ModelSerializer):
         charge = Charge.objects.create(**validated_data)
         return charge
 
-    def charge(self, validated_data):
+    @staticmethod
+    def charge(validated_data):
         server_id = validated_data.get('server_id')
         userid = validated_data.get('userid')
         days = validated_data.get('days')
@@ -176,14 +186,12 @@ class AddChargeSerializer(serializers.ModelSerializer):
             print(e)
 
 
-
 # 更新充值记录 序列化器
 class UpdateChargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Charge
         exclude = ('deleted', 'user', 'result', 'sort_time', 'create_time', 'update_time',)
         # 这里必须把user排除掉，因为充值的时候没有在数据中传递用户信息
-
 
     # 这里把user添加到参数中，让请求中能够有user信息。
     def validate(self, attrs):
@@ -210,7 +218,8 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
             instance.save()
         return instance
 
-    def reset(self, instance):
+    @staticmethod
+    def reset(instance):
         url = instance.game.reset_url
         params = {
             'server_id': instance.server_id,
@@ -231,9 +240,9 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
 
 # 返回充值信息
 class ReturnChargeSerializer(serializers.ModelSerializer):
-    '''
+    """
     下面两种返回的方式，第一种会直接返回单个字段，第二种会返回整个对象
-    '''
+    """
     game = serializers.ReadOnlyField(source='game.game_name_cn')
     user = serializers.ReadOnlyField(source='user.username')
     chargetype = serializers.ReadOnlyField(source='chargetype.type_name_cn')
@@ -247,6 +256,7 @@ class ReturnChargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Charge
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time',)
+
 
 class ChargeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -265,16 +275,20 @@ class ExportChargeSerializer(serializers.ModelSerializer):
         model = Charge
         exclude = ('deleted', 'sort_time', 'create_time', 'update_time', 'sort', 'result', 'user', 'game')
 
-    def get_game_name_cn(self, obj):
+    @staticmethod
+    def get_game_name_cn(obj):
         return obj.game.game_name_cn
 
-    def get_username(self, obj):
+    @staticmethod
+    def get_username(obj):
         return obj.user.username
 
-    def get_chargetype(self, obj):
+    @staticmethod
+    def get_chargetype(obj):
         return obj.chargetype.type_name_cn
 
-    def get_status(self, obj):
+    @staticmethod
+    def get_status(obj):
         return obj.get_status_display()
 
 
