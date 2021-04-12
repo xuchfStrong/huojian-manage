@@ -60,6 +60,6 @@ urlpatterns = [
     path('celery/', BeginCelery.as_view(), name='测试celery'),
     path('toflow/', ObjectFlowView.as_view(), name='审批操作'),
     path('querGameUser/', QueryGameUserView.as_view(), name='查询单个用户辅助信息'),
-    path('chargeSum/', ChargeSumView.as_view(), name='查询单个用户辅助信息'),
+    path('chargeSum/', ChargeSumView.as_view(), name='金额统计'),
     path('userofauth/', UserOfAuthView.as_view(), name='根据管理的游戏查询对应的用户'),
 ]

@@ -373,6 +373,7 @@ class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
             end_time = today
         game_id = self.request.query_params.get('game_id', None)
         user_id = self.request.query_params.get('user_id', None)
+        isAggregate = self.request.query_params.get('isAggregate', 0)
         select = {'day': connection.ops.date_trunc_sql('day', 'charge_time')} # 按天统计归档
         queryset = Charge.objects.filter(charge_time__range=[start_time, end_time]).extra(select=select)
         if game_id:
@@ -386,7 +387,11 @@ class ChargeSumView(mixins.ListModelMixin, generics.GenericAPIView):
             arr_user_id_int = []
             for i in arr_user_id_str:
                 arr_user_id_int.append(int(i))
-            queryset = queryset.filter(user_id__in=arr_user_id_int)
+            if int(isAggregate):
+                SecondaryDealerUser = User.objects.filter(parent_id__in = arr_user_id_int).values('id')
+                queryset = queryset.filter(Q(user_id__in=arr_user_id_int) | Q(user_id__in = SecondaryDealerUser))
+            else:
+                queryset = queryset.filter(user_id__in=arr_user_id_int)
         if bool(self.request.auth) and self.request.user.group.group_type == 'SuperAdmin':
             # 这里的双下划线超厉害。比如下面的user__username就直接可以把对应的user_id在user表中对应的username查询出来。
             queryset = queryset.values("game__game_name_cn","user__username", "day").annotate(charge_value=Sum('charge_value'))
@@ -455,10 +460,10 @@ class UserOfAuthView(generics.GenericAPIView):
             auth_id = request.user.auth.id
             qs1 = AuthGame.objects.filter(auth_id = auth_id).values('game_id')
             qs2 = AuthGame.objects.filter(game_id__in = qs1).values('auth_id')
-            qs3 = User.objects.filter(auth_id__in = qs2).values('username', 'id')
+            qs3 = User.objects.filter(auth_id__in = qs2).values('username', 'id', 'group__group_type')
             if request.user.group.group_type == 'NormalUser':
                 SecondaryDealerUser = User.objects.filter(parent_id=self.request.user.id).values('id')
-                qs3 = User.objects.filter(Q(id__in=SecondaryDealerUser) | Q(id=self.request.user.id)).values('username', 'id')
+                qs3 = User.objects.filter(Q(id__in=SecondaryDealerUser) | Q(id=self.request.user.id)).values('username', 'id', 'group__group_type')
             return Response({"message": '操作成功', "errorCode": 0, "data": qs3})
         except Exception as e:
             return Response({"message": "出现了无法预料的view视图错误：%s" % e, "errorCode": 1, "data": {}})

@@ -44,6 +44,9 @@
           class="time-picker">
         </el-date-picker>
       </el-form-item>
+      <el-form-item v-if="isShowAggregate" label="">
+        <el-checkbox v-model="my_pagination.isAggregate" @change="changeAggregate" :true-label="1" :false-label="0">聚合查询</el-checkbox>
+      </el-form-item>
     </el-form>
     <div class="tips">提示：默认统计最近7天的数据，不包括当天。</div>
     <el-table
@@ -74,14 +77,17 @@ export default {
       page_datas: [],
       gameList: [],
       userList: [],
-      my_pagination: {
-      }
+      allUserList: [],
+      my_pagination: {}
     }
   },
 
   computed: {
     isGetUser() {
       return ['SuperAdmin', 'Admin', 'NormalUser'].includes(this.$store.getters.user_obj.group.group_type) || this.$store.getters.auth_json.user.auth_list
+    },
+    isShowAggregate() {
+      return ['SuperAdmin', 'Admin'].includes(this.$store.getters.user_obj.group.group_type)
     }
   },
 
@@ -97,7 +103,8 @@ export default {
         user_id: this.my_pagination.user_id? this.my_pagination.user_id.join() : undefined,
         game_id: this.my_pagination.user_id? this.my_pagination.game_id.join() : undefined,
         start_time: this.my_pagination.start_time,
-        end_time: this.my_pagination.end_time
+        end_time: this.my_pagination.end_time,
+        isAggregate: this.my_pagination.isAggregate
       }
       GetAjax('/chargeSum/', params).then(response => {
         const data = response.data
@@ -129,7 +136,19 @@ export default {
       if (this.isGetUser) {
         GetAjax('/userofauth/', params).then(response => {
           this.userList = response.data
+          this.allUserList = response.data
         })
+      }
+    },
+
+    changeAggregate(value) {
+      this.my_pagination.user_id = []
+      if (value) {
+        this.userList = this.allUserList.filter(item => {
+          return item.group__group_type != 'SecondaryDealer'
+        })
+      } else {
+        this.userList = this.allUserList
       }
     },
 
