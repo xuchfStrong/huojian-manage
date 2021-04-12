@@ -461,9 +461,11 @@ class UserOfAuthView(generics.GenericAPIView):
             qs1 = AuthGame.objects.filter(auth_id = auth_id).values('game_id')
             qs2 = AuthGame.objects.filter(game_id__in = qs1).values('auth_id')
             qs3 = User.objects.filter(auth_id__in = qs2).values('username', 'id', 'group__group_type')
+            # qs4这种方式就是可以将values的数据进行别名处理，比如这里将查询到的group__group_type修改为别名group_type
+            # qs4 = User.objects.filter(auth_id__in=qs2).annotate(group_type=F('group__group_type')).values('username', 'id', 'group__group_type')
             if request.user.group.group_type == 'NormalUser':
                 SecondaryDealerUser = User.objects.filter(parent_id=self.request.user.id).values('id')
-                qs3 = User.objects.filter(Q(id__in=SecondaryDealerUser) | Q(id=self.request.user.id)).values('username', 'id', 'group__group_type')
+                qs3 = User.objects.filter(Q(id__in=SecondaryDealerUser) | Q(id=self.request.user.id)).values('username', 'id', group_type='group__group_type')
             return Response({"message": '操作成功', "errorCode": 0, "data": qs3})
         except Exception as e:
             return Response({"message": "出现了无法预料的view视图错误：%s" % e, "errorCode": 1, "data": {}})
