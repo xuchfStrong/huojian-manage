@@ -198,12 +198,16 @@ class UpdateChargeSerializer(serializers.ModelSerializer):
         now = datetime.datetime.now()
         this_week_start = now - datetime.timedelta(days=now.weekday())
         this_week_start_date = this_week_start.date()
+        last_week_start = now - datetime.timedelta(days=(now.weekday() + 7))
+        last_week_start_date = last_week_start.date()
         if self.instance.status == 1:
             raise serializers.ValidationError("已经撤回的记录,无法撤回。")
         elif self.instance.status == 2:
             raise serializers.ValidationError("充值失败的记录无法撤回。")
-        elif self.instance.charge_time.date() <= this_week_start_date:
-            raise serializers.ValidationError("周一能撤回上周的记录，其他时间只能撤回本周的记录。")
+        elif now.weekday() == 0 and self.instance.charge_time.date() < last_week_start_date:
+            raise serializers.ValidationError("周一能撤回上周记录，其他时间只能撤回本周的记录。")
+        elif now.weekday() > 0 and self.instance.charge_time.date() < this_week_start_date:
+            raise serializers.ValidationError("周一能撤回上周记录，其他时间只能撤回本周的记录。")
         # elif self.instance.user_id != self.context['request'].user.id:
         #     raise serializers.ValidationError("只能撤回自己的记录。")
         return attrs
